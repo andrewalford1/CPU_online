@@ -676,6 +676,26 @@ PrefabInstance:
       propertyPath: GP_B
       value: 
       objectReference: {fileID: 1842204738}
+    - target: {fileID: 8164345316206226851, guid: e58914496711add4fb318ac03b8eecff,
+        type: 3}
+      propertyPath: fetch_btn
+      value: 
+      objectReference: {fileID: 2034130655}
+    - target: {fileID: 8164345316206226851, guid: e58914496711add4fb318ac03b8eecff,
+        type: 3}
+      propertyPath: decode_btn
+      value: 
+      objectReference: {fileID: 1256069767}
+    - target: {fileID: 8164345316206226851, guid: e58914496711add4fb318ac03b8eecff,
+        type: 3}
+      propertyPath: execute_btn
+      value: 
+      objectReference: {fileID: 392504047}
+    - target: {fileID: 8164345316206226851, guid: e58914496711add4fb318ac03b8eecff,
+        type: 3}
+      propertyPath: reset_btn
+      value: 
+      objectReference: {fileID: 1503804021}
     m_RemovedComponents:
     - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: e58914496711add4fb318ac03b8eecff, type: 3}
@@ -1414,18 +1434,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 392504048}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 64984022}
-        m_MethodName: Execute
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &392504048
@@ -3411,18 +3420,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1256069768}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 64984022}
-        m_MethodName: Decode
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1256069768
@@ -4057,18 +4055,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1503804022}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 64984022}
-        m_MethodName: Reset
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1503804022
@@ -5609,18 +5596,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2034130656}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 64984022}
-        m_MethodName: Fetch
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &2034130656

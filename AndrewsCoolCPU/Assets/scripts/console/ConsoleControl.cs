@@ -100,7 +100,7 @@ public class ConsoleControl : MonoBehaviour {
             Instruction instruction = CU.GetInstruction(text);
             if (instruction != null) {
                 LogCommand(text);
-                CU.SetCurrentInstruction(instruction.ID);
+                CU.SetCurrentInstructionFromConsole(instruction.ID);
                 CU.Execute();
                 return true;
             }

@@ -27,6 +27,8 @@ public class ControlUnit : MonoBehaviour
     [SerializeField] private MemoryListControl      memory                  = null;
     //ALU
     [SerializeField] private ArithmeticLogicUnit    ALU                     = null;
+    //CLOCK
+    [SerializeField] private Clock                  clock                   = null;
     //BUTTONS
     [SerializeField] private Button                 fetch_btn               = null;
     [SerializeField] private Button                 decode_btn              = null;
@@ -40,9 +42,6 @@ public class ControlUnit : MonoBehaviour
     //[currentlyProecssing] 'True' whilst the CU is in use. 
     //(Prevents multiple operations occurring at once.
     private bool currentlyProcessing = false;
-
-    //[clockSpeed] How quickly the CPU operates.
-    private float clockSpeed = 1.0f;
 
     /**
      * @brief Inialise the Control Unit.
@@ -112,16 +111,16 @@ public class ControlUnit : MonoBehaviour
      */
     IEnumerator FetchCoroutine() {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Send the address stored in PC to the MAR for fetching.
         MAR.Write(PC.ReadString());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Increment the PC.
         PC.Increment();
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Set the memory pointer to the value of MAR.
         memory.SetPointer(MAR.ReadUnsigned());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Write the contents of the memory address being pointed to into MDR.
         MDR.Write(memory.ReadFromMemorySlot());
         currentlyProcessing = false;
@@ -146,10 +145,10 @@ public class ControlUnit : MonoBehaviour
     IEnumerator DecodeCoroutine()
     {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Copy the contents of the MDR into the IR for decoding.
         IR.Write(MDR.ReadString());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         SetCurrentInstructionFromCU(IR.Opcode());
         currentlyProcessing = false;
     }
@@ -205,6 +204,8 @@ public class ControlUnit : MonoBehaviour
             GP_B.Reset();
             //Reset the ALU
             ALU.Reset();
+            //Reset the clock
+            clock.Reset();
             //Set up the first instruction in the CU.
             SetCurrentInstructionFromCU(0);
             ConsoleControl.CONSOLE.LogMessage("CPU Reset");
@@ -253,19 +254,19 @@ public class ControlUnit : MonoBehaviour
      */
     IEnumerator InstructionCoroutine_ADD(Register x) {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Copy the contents of register 'x' into ALUx.
         ALU.WriteX(x.ReadString());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Copy the Instruction Registers operand into ALUy.
         ALU.WriteY(IR.OperandString());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Set the ALU's circuity.
         ALU.SetAdditionCircuitry();
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Compute ALUz.
         ALU.ComputeZ();
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Store the result into register x.
         x.Write(ALU.ReadZ());
         currentlyProcessing = false;
@@ -287,22 +288,22 @@ public class ControlUnit : MonoBehaviour
      */
     IEnumerator InstructionCoroutine_ADD(Register x, Register y) {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Copy the contents of register 'x' into ALUx.
         ALU.WriteX(x.ReadString());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Copy the contents of register 'y' into ALUy.
         ALU.WriteY(y.ReadString());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Set the ALU's circuity.
         ALU.SetAdditionCircuitry();
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Compute ALUz.
         ALU.ComputeZ();
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         //Store the result into register x.
         x.Write(ALU.ReadZ());
-        yield return new WaitForSeconds(clockSpeed);
+        yield return new WaitForSeconds(clock.GetSpeed());
         currentlyProcessing = false;
     }
 

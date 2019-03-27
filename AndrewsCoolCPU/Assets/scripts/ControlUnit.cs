@@ -62,22 +62,49 @@ public class ControlUnit : MonoBehaviour
         Decode();
     }
 
+    private bool currentlyProcessing = false;
+
+    IEnumerator CPUfetch() {
+        currentlyProcessing = true;
+        yield return new WaitForSeconds(1);
+        Debug.Log("from ienumerator");
+        yield return new WaitForSeconds(1);
+        //Send the address stored in PC to the MAR for fetching.
+        MAR.Write(PC.ReadString());
+        yield return new WaitForSeconds(1);
+        //Increment the PC.
+        PC.Increment();
+        yield return new WaitForSeconds(1);
+        //Set the memory pointer to the value of MAR.
+        memory.SetPointer(MAR.ReadUnsigned());
+        yield return new WaitForSeconds(1);
+        //Write the contents of the memory address being pointed to into MDR.
+        MDR.Write(memory.ReadFromMemorySlot());
+        currentlyProcessing = false;
+    }
+
     /**
      * @brief Performs a CPU fetch.
      */
     public void Fetch()
     {
-        //Send the address stored in PC to the MAR for fetching.
-        MAR.Write(PC.ReadString());
+        ////Send the address stored in PC to the MAR for fetching.
+        //MAR.Write(PC.ReadString());
 
-        //Increment the PC.
-        PC.Increment();
+        ////Increment the PC.
+        //PC.Increment();
 
-        //Set the memory pointer to the value of MAR.
-        memory.SetPointer(MAR.ReadUnsigned());
+        ////Set the memory pointer to the value of MAR.
+        //memory.SetPointer(MAR.ReadUnsigned());
 
-        //Write the contents of the memory address being pointed to into MDR.
-        MDR.Write(memory.ReadFromMemorySlot());
+        ////Write the contents of the memory address being pointed to into MDR.
+        //MDR.Write(memory.ReadFromMemorySlot());
+
+        if(!currentlyProcessing) {
+            StartCoroutine(CPUfetch());
+        } else {
+            Debug.Log("Sorry John, I cannont do that");
+        }
     }
 
     public void Decode()

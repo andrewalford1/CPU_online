@@ -185,7 +185,7 @@ public class MemoryListControl : MonoBehaviour
 
     /**
      * @brief Toggles interaction with the component's UI.
-     * @param active - If 'true' then memory cannont be 
+     * @param active - If 'true' then memory cannot be 
      *                 manually manipulated.
      */
     public void SetActive(bool active) {

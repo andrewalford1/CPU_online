@@ -102,6 +102,10 @@ public class ControlUnit : MonoBehaviour
         }
     }
 
+    public bool IsCurrentlyProcessing() {
+        return currentlyProcessing;
+    }
+
     /**
      * @brief A coroutine to perform a CPU fetch 
      *        at the desired clockspeed.

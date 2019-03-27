@@ -32,7 +32,6 @@ public class ConsoleControl : MonoBehaviour {
     //items. (For scrolling through previous logs).
     private int previousItemIndex = 0;
 
-
     /**
      * @brief Initialise the console.
      */
@@ -94,6 +93,12 @@ public class ConsoleControl : MonoBehaviour {
      *          as a valid command.
      */
     public bool ValidateCommand(string text) {
+        //Do not perform any commands if the CPU is currently processing.
+        if(CU.IsCurrentlyProcessing()) {
+            LogError("Console cannot perform commands while the CU is processing");
+            return false;
+        }
+
         //If it is not a global command then
         //it may be a micro instuction.
         if(!CheckForGlobalCommand(text)) {

@@ -88,6 +88,11 @@ public class ControlUnit : MonoBehaviour
         decode_btn.interactable     = !currentlyProcessing;
         execute_btn.interactable    = !currentlyProcessing;
         reset_btn.interactable      = !currentlyProcessing;
+        if(memory.IsActive() && currentlyProcessing) {
+            memory.SetActive(false);
+        } else if(!memory.IsActive() && !currentlyProcessing) {
+            memory.SetActive(true);
+        }
     }
 
     /**

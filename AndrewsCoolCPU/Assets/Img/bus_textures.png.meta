@@ -103,9 +103,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 208.5
-        width: 833.5
-        height: 208.5
+        y: 0
+        width: 83.5
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -113,7 +113,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ad42d59d300b17c42b236c98a98168c2
+      spriteID: 0bf847ad29e75314aa07da61df5cef48
       vertices: []
       indices: 
       edges: []
@@ -122,10 +122,10 @@ TextureImporter:
       name: bus_textures_1
       rect:
         serializedVersion: 2
-        x: 833
-        y: 208.5
-        width: 833.5
-        height: 208.5
+        x: 83
+        y: 0
+        width: 83.5
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -133,47 +133,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5a8231b49a90cb6499bb1389240bcb14
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: bus_textures_2
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0.5
-        width: 833.5
-        height: 208.5
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c9c3bcfb052c5b1489017b05d259e8d9
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: bus_textures_3
-      rect:
-        serializedVersion: 2
-        x: 833
-        y: 0.5
-        width: 833.5
-        height: 208.5
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 10390e50ae2050b4da7daed756099a34
+      spriteID: ab5220e452a24f74f8b64616de33d0d4
       vertices: []
       indices: 
       edges: []

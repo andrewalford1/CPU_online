@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,13 +7,14 @@ using UnityEngine.UI;
  * @extends MonoBehaviour
  * @author Andrew Alford
  * @date 26/02/2019
- * @version 1.1 - 14/03/2019
+ * @version 1.2 - 27/03/2019
  */
 public class MemoryListControl : MonoBehaviour
 {
     [SerializeField]
     GameObject inputFieldTemplate = null;
 
+    //[NUM_MEMORY_LOCATIONS] Stores the total number of memory locations.
     public const int NUM_MEMORY_LOCATIONS = 256;
 
     //[memoryLocationsUI] The UI for all the memory locations.
@@ -26,6 +26,9 @@ public class MemoryListControl : MonoBehaviour
     //[pointer] Points to the currently "focused on" memory slot
     //for accessing read/write functionality.
     private int pointer = 0;
+
+    //[active] While 'true' memory can be manipulated by the user.
+    private bool active = true;
 
     /**
      * @brief Initialisation code of the memory controls.
@@ -58,7 +61,6 @@ public class MemoryListControl : MonoBehaviour
             memoryLocationsUI[i].GetComponentsInChildren<InputField>()[0].onValidateInput += 
                 delegate (string input, int charIndex, char addedChar) 
                 { return InputValidation.validateAsHex(addedChar); };
-
         }
 
         //[loactionIndex] Used to point to a specific place in memory.
@@ -179,5 +181,28 @@ public class MemoryListControl : MonoBehaviour
     public string ReadFromMemorySlot()
     {
         return slots[pointer].Read();
+    }
+
+    /**
+     * @brief Toggles interaction with the component's UI.
+     * @param active - If 'true' then memory cannot be 
+     *                 manually manipulated.
+     */
+    public void SetActive(bool active) {
+        this.active = active;
+        int locationIndex = 0;
+        foreach(MemorySlot slot in slots) {
+            memoryLocationsUI[locationIndex].
+                GetComponentsInChildren<InputField>()[0].
+                interactable = active;
+            locationIndex++;
+        }
+    }
+
+    /**
+     * @returns 'True' if this component is active.
+     */
+    public bool IsActive() {
+        return active;
     }
 }

@@ -2,6 +2,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/**
+ * @brief   Class to define and control all bus animations.
+ * @extends MonoBehaviour
+ * @author  Andrew Alford
+ * @date    28/03/2019
+ * @version 1.0 - 28/03/2019
+ */
 public class BusControl : MonoBehaviour {
     //BUS_PATHS {
     //    MAIN_A,                 //0
@@ -94,63 +101,63 @@ public class BusControl : MonoBehaviour {
 
     //Define routes for each bus.
     //PC
-    private readonly int[] pc_to_pc = { 11, 12, 13, 14 }; //0
-    private readonly int[] pc_to_mar = { 15, 0, 16 }; //1
-    private readonly int[] pc_to_mdr = { 15, 0, 1, 2, 18 }; //2
-    private readonly int[] pc_to_ir = { 15, 0, 1, 2, 17 }; //3
-    private readonly int[] pc_to_cu = { 15, 0, 1, 2, 3, 4, 19 }; //4
-    private readonly int[] pc_to_gpa = { 15, 0, 1, 2, 3, 4, 5, 6, 20 }; //5
-    private readonly int[] pc_to_gpb = { 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 21 }; //6
-    private readonly int[] pc_to_alux = { 15, 0, 1, 2, 3, 4, 5, 6, 24, 23, 22 }; //7
-    private readonly int[] pc_to_aluy = { 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 }; //8
-    private readonly int[] pc_to_aluz = { 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 28 }; //9
+    private readonly int[] pc_to_pc         = { 11, 12, 13, 14 };                                       //0
+    private readonly int[] pc_to_mar        = { 15, 0, 16 };                                            //1
+    private readonly int[] pc_to_mdr        = { 15, 0, 1, 2, 18 };                                      //2
+    private readonly int[] pc_to_ir         = { 15, 0, 1, 2, 17 };                                      //3
+    private readonly int[] pc_to_cu         = { 15, 0, 1, 2, 3, 4, 19 };                                //4
+    private readonly int[] pc_to_gpa        = { 15, 0, 1, 2, 3, 4, 5, 6, 20 };                          //5
+    private readonly int[] pc_to_gpb        = { 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 21 };                    //6
+    private readonly int[] pc_to_alux       = { 15, 0, 1, 2, 3, 4, 5, 6, 24, 23, 22 };                  //7
+    private readonly int[] pc_to_aluy       = { 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 };     //8
+    private readonly int[] pc_to_aluz       = { 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 28 };                    //9
     //MAR
-    private readonly int[] mar_to_memory = { 32 }; //10
-    private readonly int[] mar_to_mdr = { 16, 0, 1, 2, 18 }; //11
-    private readonly int[] mar_to_ir = { 16, 0, 1, 2, 17 }; //12
-    private readonly int[] mar_to_cu = { 16, 0, 1, 2, 3, 4, 19 }; //13
-    private readonly int[] mar_to_gpa = { 16, 0, 1, 2, 3, 4, 5, 6, 20 }; //14
-    private readonly int[] mar_to_gpb = { 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 21 }; //15
-    private readonly int[] mar_to_alux = { 16, 0, 1, 2, 3, 4, 5, 6, 24, 23, 22 }; //16
-    private readonly int[] mar_to_aluy = { 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 }; //17
-    private readonly int[] mar_to_aluz = { 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 28 }; //18
+    private readonly int[] mar_to_memory    = { 32 };                                                   //10
+    private readonly int[] mar_to_mdr       = { 16, 0, 1, 2, 18 };                                      //11
+    private readonly int[] mar_to_ir        = { 16, 0, 1, 2, 17 };                                      //12
+    private readonly int[] mar_to_cu        = { 16, 0, 1, 2, 3, 4, 19 };                                //13
+    private readonly int[] mar_to_gpa       = { 16, 0, 1, 2, 3, 4, 5, 6, 20 };                          //14
+    private readonly int[] mar_to_gpb       = { 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 21 };                    //15
+    private readonly int[] mar_to_alux      = { 16, 0, 1, 2, 3, 4, 5, 6, 24, 23, 22 };                  //16
+    private readonly int[] mar_to_aluy      = { 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 };     //17
+    private readonly int[] mar_to_aluz      = { 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 28 };                    //18
     //MDR
-    private readonly int[] mdr_to_memory = { 33 }; //19
-    private readonly int[] mdr_to_ir = { 18, 2, 17 }; //20
-    private readonly int[] mdr_to_cu = { 18, 2, 3, 4, 19 }; //21
-    private readonly int[] mdr_to_gpa = { 18, 2, 3, 4, 5, 6, 20 }; //22
-    private readonly int[] mdr_to_gpb = { 18, 2, 3, 4, 5, 6, 7, 8, 21 }; //23
-    private readonly int[] mdr_to_alux = { 18, 2, 3, 4, 5, 6, 24, 23, 22 }; //24
-    private readonly int[] mdr_to_aluy = { 18, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 }; //25
-    private readonly int[] mdr_to_aluz = { 18, 2, 3, 4, 5, 6, 7, 8, 28 }; //26
+    private readonly int[] mdr_to_memory    = { 33 };                                                   //19
+    private readonly int[] mdr_to_ir        = { 18, 2, 17 };                                            //20
+    private readonly int[] mdr_to_cu        = { 18, 2, 3, 4, 19 };                                      //21
+    private readonly int[] mdr_to_gpa       = { 18, 2, 3, 4, 5, 6, 20 };                                //22
+    private readonly int[] mdr_to_gpb       = { 18, 2, 3, 4, 5, 6, 7, 8, 21 };                          //23
+    private readonly int[] mdr_to_alux      = { 18, 2, 3, 4, 5, 6, 24, 23, 22 };                        //24
+    private readonly int[] mdr_to_aluy      = { 18, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 };           //25
+    private readonly int[] mdr_to_aluz      = { 18, 2, 3, 4, 5, 6, 7, 8, 28 };                          //26
     //IR
-    private readonly int[] ir_to_cu = { 31 }; //27
-    private readonly int[] ir_to_gpa = { 17, 2, 3, 4, 5, 6, 20 }; //28
-    private readonly int[] ir_to_gpb = { 17, 2, 3, 4, 5, 6, 7, 8, 21 }; //29
-    private readonly int[] ir_to_alux = { 17, 2, 3, 4, 5, 6, 24, 23, 22 }; //30
-    private readonly int[] ir_to_aluy = { 17, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 }; //31
-    private readonly int[] ir_to_aluz = { 17, 2, 3, 4, 5, 6, 7, 8, 28 }; //32
+    private readonly int[] ir_to_cu         = { 31 };                                                   //27
+    private readonly int[] ir_to_gpa        = { 17, 2, 3, 4, 5, 6, 20 };                                //28
+    private readonly int[] ir_to_gpb        = { 17, 2, 3, 4, 5, 6, 7, 8, 21 };                          //29
+    private readonly int[] ir_to_alux       = { 17, 2, 3, 4, 5, 6, 24, 23, 22 };                        //30
+    private readonly int[] ir_to_aluy       = { 17, 2, 3, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 };           //31
+    private readonly int[] ir_to_aluz       = { 17, 2, 3, 4, 5, 6, 7, 8, 28 };                          //32
     //CU
-    private readonly int[] cu_to_ir = { 19, 4, 3, 2, 17 }; //33
-    private readonly int[] cu_to_gpa = { 19, 4, 5, 6, 20 }; //34
-    private readonly int[] cu_to_gpb = { 19, 4, 5, 6, 7, 8, 21 }; //35
-    private readonly int[] cu_to_alux = { 19, 4, 5, 6, 24, 23, 22 }; //36
-    private readonly int[] cu_to_aluy = { 19, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 }; //37
-    private readonly int[] cu_to_aluz = { 19, 4, 5, 6, 7, 8, 28 }; //38
+    private readonly int[] cu_to_ir         = { 19, 4, 3, 2, 17 };                                      //33
+    private readonly int[] cu_to_gpa        = { 19, 4, 5, 6, 20 };                                      //34
+    private readonly int[] cu_to_gpb        = { 19, 4, 5, 6, 7, 8, 21 };                                //35
+    private readonly int[] cu_to_alux       = { 19, 4, 5, 6, 24, 23, 22 };                              //36
+    private readonly int[] cu_to_aluy       = { 19, 4, 5, 6, 7, 8, 9, 10, 27, 26, 25 };                 //37
+    private readonly int[] cu_to_aluz       = { 19, 4, 5, 6, 7, 8, 28 };                                //38
     //GPA
-    private readonly int[] gpa_to_gpb = { 20, 6, 7, 8, 21 }; //39
-    private readonly int[] gpa_to_alux = { 20, 6, 24, 23, 22 }; //40
-    private readonly int[] gpa_to_aluy = { 20, 6, 7, 8, 9, 10, 27, 26, 25 }; //41
-    private readonly int[] gpa_to_aluz = { 20, 6, 7, 8, 28 }; //42
+    private readonly int[] gpa_to_gpb       = { 20, 6, 7, 8, 21 };                                      //39
+    private readonly int[] gpa_to_alux      = { 20, 6, 24, 23, 22 };                                    //40
+    private readonly int[] gpa_to_aluy      = { 20, 6, 7, 8, 9, 10, 27, 26, 25 };                       //41
+    private readonly int[] gpa_to_aluz      = { 20, 6, 7, 8, 28 };                                      //42
     //GPB
-    private readonly int[] gpb_to_alux = { 21, 8, 7, 6, 24, 23, 22 }; //43
-    private readonly int[] gpb_to_aluy = { 21, 8, 9, 10, 27, 26, 25 }; //44
-    private readonly int[] gpb_to_aluz = { 21, 8, 28 }; //45
+    private readonly int[] gpb_to_alux      = { 21, 8, 7, 6, 24, 23, 22 };                              //43
+    private readonly int[] gpb_to_aluy      = { 21, 8, 9, 10, 27, 26, 25 };                             //44
+    private readonly int[] gpb_to_aluz      = { 21, 8, 28 };                                            //45
     //ALUX
-    private readonly int[] alux_to_aluy = { 22, 23, 24, 6, 7, 8, 9, 10, 27, 26, 25 }; //46
-    private readonly int[] alux_to_aluz = { 22, 23, 24, 6, 7, 8, 28 }; //47
+    private readonly int[] alux_to_aluy     = { 22, 23, 24, 6, 7, 8, 9, 10, 27, 26, 25 };               //46
+    private readonly int[] alux_to_aluz     = { 22, 23, 24, 6, 7, 8, 28 };                              //47
     //ALUZ
-    private readonly int[] aluz_to_psr = { 29, 30 }; //48
+    private readonly int[] aluz_to_psr      = { 29, 30 };                                               //48
 
 
 

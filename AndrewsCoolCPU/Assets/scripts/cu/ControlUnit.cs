@@ -6,10 +6,10 @@ using System.IO;
 using UnityEngine.Networking;
 
 /**
- * @brief Class representing the simulators control unit.
+ * @brief   Class representing the simulators control unit.
  * @extends MonoBehaviour
- * @author Andrew Alford
- * @date 20/03/2019
+ * @author  Andrew Alford
+ * @date    20/03/2019
  * @version 1.2 - 27/03/2019
  */
 public class ControlUnit : MonoBehaviour
@@ -29,6 +29,8 @@ public class ControlUnit : MonoBehaviour
     [SerializeField] private ArithmeticLogicUnit    ALU                     = null;
     //CLOCK
     [SerializeField] private Clock                  clock                   = null;
+    //BUSES
+    [SerializeField] private BusControl             buses                   = null;
     //BUTTONS
     [SerializeField] private Button                 fetch_btn               = null;
     [SerializeField] private Button                 decode_btn              = null;
@@ -113,21 +115,28 @@ public class ControlUnit : MonoBehaviour
         currentlyProcessing = true;
 
         //Send the address stored in PC to the MAR for fetching.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.PC_MAR);
         yield return new WaitForSeconds(clock.GetSpeed());
         MAR.Write(PC.ReadString());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.PC_MAR);
 
         //Increment the PC.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.PC_PC);
         yield return new WaitForSeconds(clock.GetSpeed());
         PC.Increment();
-
+        buses.StopTransferringData(BusControl.BUS_ROUTE.PC_PC);
         
         //Set the memory pointer to the value of MAR.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.MAR_MEMORY);
         yield return new WaitForSeconds(clock.GetSpeed());
         memory.SetPointer(MAR.ReadUnsigned());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.MAR_MEMORY);
 
         //Write the contents of the memory address being pointed to into MDR.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.MDR_MEMORY);
         yield return new WaitForSeconds(clock.GetSpeed());
         MDR.Write(memory.ReadFromMemorySlot());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.MDR_MEMORY);
 
         currentlyProcessing = false;
     }

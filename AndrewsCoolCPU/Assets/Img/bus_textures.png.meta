@@ -4,8 +4,6 @@ TextureImporter:
   fileIDToRecycleName:
     21300000: bus_textures_0
     21300002: bus_textures_1
-    21300004: bus_textures_2
-    21300006: bus_textures_3
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -104,8 +102,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 83.5
-        height: 42
+        width: 854.5
+        height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -113,7 +111,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0bf847ad29e75314aa07da61df5cef48
+      spriteID: 951e76621462d7d4da4fd5528b0f65c3
       vertices: []
       indices: 
       edges: []
@@ -122,10 +120,10 @@ TextureImporter:
       name: bus_textures_1
       rect:
         serializedVersion: 2
-        x: 83
+        x: 854
         y: 0
-        width: 83.5
-        height: 42
+        width: 854.5
+        height: 97
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -133,7 +131,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ab5220e452a24f74f8b64616de33d0d4
+      spriteID: 255c74a08ede27f44bed2ce29896bef7
       vertices: []
       indices: 
       edges: []
@@ -141,7 +139,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: e91f784906f996246842e3189d026122
+    spriteID: b9a8b1680a70ecb47b37ea5fab4090b3
     vertices: []
     indices: 
     edges: []

@@ -6,8 +6,6 @@ public class Bus : MonoBehaviour {
 
     [SerializeField] Animator[] animators = null;
 
-    private bool transferringData = false;
-
     private void Start() {
         ToggleAnimators(false);
     }

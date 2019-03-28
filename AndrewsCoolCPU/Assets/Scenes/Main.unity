@@ -287,6 +287,10 @@ MonoBehaviour:
   - {fileID: 1522441596}
   - {fileID: 2120751023}
   - {fileID: 75643178}
+  sprites:
+  - {fileID: 2120751024}
+  - {fileID: 75643176}
+  - {fileID: 1522441594}
 --- !u!224 &56318315 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 328836098496551333, guid: e58914496711add4fb318ac03b8eecff,
@@ -615,6 +619,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animators:
   - {fileID: 1068676864}
+  sprites:
+  - {fileID: 1068676862}
 --- !u!1001 &190060297
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2818,6 +2824,11 @@ MonoBehaviour:
   - {fileID: 1853643608}
   - {fileID: 1422275131}
   - {fileID: 1286633105}
+  sprites:
+  - {fileID: 1054897524}
+  - {fileID: 1853643606}
+  - {fileID: 1422275129}
+  - {fileID: 1286633103}
 --- !u!1 &757551324
 GameObject:
   m_ObjectHideFlags: 0
@@ -5113,6 +5124,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animators:
   - {fileID: 24793749}
+  sprites:
+  - {fileID: 24793747}
 --- !u!224 &1784938873
 RectTransform:
   m_ObjectHideFlags: 0

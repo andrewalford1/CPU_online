@@ -17,13 +17,14 @@ public class Clock : MonoBehaviour
     [SerializeField] private Text display = null;
 
     //[speed] The current clock speed.
-    private float speed = 1.0f;
+    private float speed;
 
     /**
      * @brief Initalises the CPU clock.
      */
     void Start()
     {
+        SetSpeed();
         SetDisplay();
         control.onValueChanged.AddListener(delegate {
             SetSpeed();
@@ -49,7 +50,7 @@ public class Clock : MonoBehaviour
      * @brief Sets the clock speed from the slider's value.
      */
     private void SetSpeed() {
-        speed = (float)(Math.Round((double)control.value, 2));
+        speed = (float)(Math.Round((double)control.value, 1));
     }
 
     /**

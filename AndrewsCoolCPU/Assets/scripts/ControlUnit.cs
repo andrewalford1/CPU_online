@@ -29,11 +29,6 @@ public class ControlUnit : MonoBehaviour
     [SerializeField] private ArithmeticLogicUnit    ALU                     = null;
     //CLOCK
     [SerializeField] private Clock                  clock                   = null;
-    //BUSES
-    [SerializeField] private Bus PC_to_PC = null;
-    [SerializeField] private Bus PC_to_MAR = null;
-    [SerializeField] private Bus MAR_to_Memory = null;
-    [SerializeField] private Bus Memory_to_MDR = null;
     //BUTTONS
     [SerializeField] private Button                 fetch_btn               = null;
     [SerializeField] private Button                 decode_btn              = null;
@@ -118,29 +113,21 @@ public class ControlUnit : MonoBehaviour
         currentlyProcessing = true;
 
         //Send the address stored in PC to the MAR for fetching.
-        PC_to_MAR.StartTransferringData();
         yield return new WaitForSeconds(clock.GetSpeed());
         MAR.Write(PC.ReadString());
-        PC_to_MAR.StopTransferringData();
 
         //Increment the PC.
-        PC_to_PC.StartTransferringData();
         yield return new WaitForSeconds(clock.GetSpeed());
         PC.Increment();
-        PC_to_PC.StopTransferringData();
 
         
         //Set the memory pointer to the value of MAR.
-        MAR_to_Memory.StartTransferringData();
         yield return new WaitForSeconds(clock.GetSpeed());
         memory.SetPointer(MAR.ReadUnsigned());
-        MAR_to_Memory.StopTransferringData();
 
         //Write the contents of the memory address being pointed to into MDR.
-        Memory_to_MDR.StartTransferringData();
         yield return new WaitForSeconds(clock.GetSpeed());
         MDR.Write(memory.ReadFromMemorySlot());
-        Memory_to_MDR.StopTransferringData();
 
         currentlyProcessing = false;
     }

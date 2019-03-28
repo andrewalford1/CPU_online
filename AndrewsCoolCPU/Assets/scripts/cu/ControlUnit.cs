@@ -160,11 +160,19 @@ public class ControlUnit : MonoBehaviour
     IEnumerator DecodeCoroutine()
     {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Copy the contents of the MDR into the IR for decoding.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.MDR_IR);
+        yield return new WaitForSeconds(clock.GetSpeed());
         IR.Write(MDR.ReadString());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.MDR_IR);
+
+        //Decode IR's opcode.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.IR_CU);
         yield return new WaitForSeconds(clock.GetSpeed());
         SetCurrentInstructionFromCU(IR.Opcode());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.IR_CU);
+
         currentlyProcessing = false;
     }
 
@@ -268,22 +276,33 @@ public class ControlUnit : MonoBehaviour
      * @param x - The register to be added to.
      */
     IEnumerator InstructionCoroutine_ADD(Register x) {
+
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Copy the contents of register 'x' into ALUx.
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteX(x.ReadString());
-        yield return new WaitForSeconds(clock.GetSpeed());
+
+
         //Copy the Instruction Registers operand into ALUy.
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteY(IR.OperandString());
-        yield return new WaitForSeconds(clock.GetSpeed());
+
+
         //Set the ALU's circuity.
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.SetAdditionCircuitry();
-        yield return new WaitForSeconds(clock.GetSpeed());
+
+
         //Compute ALUz.
-        ALU.ComputeZ();
         yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.ComputeZ();
+
+
         //Store the result into register x.
+        yield return new WaitForSeconds(clock.GetSpeed());
         x.Write(ALU.ReadZ());
+        
         currentlyProcessing = false;
     }
 
@@ -303,22 +322,27 @@ public class ControlUnit : MonoBehaviour
      */
     IEnumerator InstructionCoroutine_ADD(Register x, Register y) {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Copy the contents of register 'x' into ALUx.
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteX(x.ReadString());
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Copy the contents of register 'y' into ALUy.
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteY(y.ReadString());
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Set the ALU's circuity.
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.SetAdditionCircuitry();
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Compute ALUz.
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.ComputeZ();
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Store the result into register x.
-        x.Write(ALU.ReadZ());
         yield return new WaitForSeconds(clock.GetSpeed());
+        x.Write(ALU.ReadZ());
+
         currentlyProcessing = false;
     }
 

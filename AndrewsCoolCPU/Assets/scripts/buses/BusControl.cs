@@ -96,7 +96,8 @@ public class BusControl : MonoBehaviour {
         GPB_ALUZ,               //45     PATH{ 21 -> 8  -> 28 }
         ALUX_ALUY,              //46     PATH{ 22 -> 23 -> 24 -> 6  -> 7  -> 8  -> 9  -> 10 -> 27 -> 26 -> 25 }
         ALUX_ALUZ,              //47     PATH{ 22 -> 23 -> 24 -> 6  -> 7  -> 8  -> 28 }
-        ALUZ_PSR                //48     PATH{ 29 -> 30 }
+        ALUZ_PSR,               //48     PATH{ 29 -> 30 }
+        NONE                    //49     USE WHEN NO ROUTE IS APPLICABLE
     }
 
     //Define routes for each bus.
@@ -252,7 +253,6 @@ public class BusControl : MonoBehaviour {
      *                 otherwise stop playing it.
      */
     private void ToggleAnimations(BUS_ROUTE route, bool active) {
-
         //Loop through every bus object in the route.
         for (int i = 0; i < routes[(int)route].Length; i++) {
             if (active) {
@@ -272,7 +272,10 @@ public class BusControl : MonoBehaviour {
      * @param route - The route to transfer the data along.
      */
     public void StartTransferringData(BUS_ROUTE route) {
-        ToggleAnimations(route, true);
+        //Only take the route if it is valid.
+        if(!route.Equals(BUS_ROUTE.NONE)) {
+            ToggleAnimations(route, true);
+        }
     }  
 
     /**
@@ -280,6 +283,9 @@ public class BusControl : MonoBehaviour {
      * @param route - The route to stop transferring data along.
      */
     public void StopTransferringData(BUS_ROUTE route) {
-        ToggleAnimations(route, false);
+        //Only take the route if it is valid.
+        if(!route.Equals(BUS_ROUTE.NONE)) {
+            ToggleAnimations(route, false);
+        }
     }
 }

@@ -38,7 +38,7 @@ public class ConsoleControl : MonoBehaviour {
     private void Awake() {
         //DECLARE AS SINGLETON...
 
-        //Code to make the Game Manager a singleton (like me).
+        //Code to make the Game Manager a singleton.
         if (!CONSOLE) {
             //If the game manager does not yet exist,
             //assign it to this instance.

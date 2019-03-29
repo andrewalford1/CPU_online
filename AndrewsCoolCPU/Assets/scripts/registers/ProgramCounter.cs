@@ -8,10 +8,21 @@ using UnityEngine.UI;
  * @extends Register
  * @author Andrew Alford
  * @date 28/02/2019
- * @version 1.2 - 14/03/2019
+ * @version 1.3 - 29/03/2019
  */
 public class ProgramCounter : Register
 {
+    public override BusControl.BUS_ROUTE RouteToPC      => BusControl.BUS_ROUTE.NONE;
+    public override BusControl.BUS_ROUTE RouteToMAR     => BusControl.BUS_ROUTE.PC_MAR;
+    public override BusControl.BUS_ROUTE RouteToMDR     => BusControl.BUS_ROUTE.PC_MDR;
+    public override BusControl.BUS_ROUTE RouteToCU      => BusControl.BUS_ROUTE.PC_CU;
+    public override BusControl.BUS_ROUTE RouteToIR      => BusControl.BUS_ROUTE.MDR_IR;
+    public override BusControl.BUS_ROUTE RouteToGPA     => BusControl.BUS_ROUTE.PC_GPA;
+    public override BusControl.BUS_ROUTE RouteToGPB     => BusControl.BUS_ROUTE.PC_GPB;
+    public override BusControl.BUS_ROUTE RouteToALUx    => BusControl.BUS_ROUTE.PC_ALUX;
+    public override BusControl.BUS_ROUTE RouteToALUy    => BusControl.BUS_ROUTE.PC_ALUY;
+    public override BusControl.BUS_ROUTE RouteToALUz    => BusControl.BUS_ROUTE.PC_ALUZ;
+
     public new void Start()
     {
         //Assign a name to the register.

@@ -3,6 +3,6 @@
  * @extends Register
  * @author Andrew Alford
  * @date 12/02/2019
- * @version 1.0 - 12/02/2019
+ * @version 1.1 - 29/03/2019
  */
-public class GeneralPurposeRegister : Register { }
+public abstract class GeneralPurposeRegister : Register { }

@@ -22,6 +22,19 @@ public abstract class Register : SimulatorComponent {
     //[active] While 'true' the register can be interacted with.
     protected bool active = true;
 
+    //Abstract functions to define the possible routes 
+    //between this register and others.
+    public abstract BusControl.BUS_ROUTE RouteToPC { get; }
+    public abstract BusControl.BUS_ROUTE RouteToMAR { get; }
+    public abstract BusControl.BUS_ROUTE RouteToMDR { get; }
+    public abstract BusControl.BUS_ROUTE RouteToIR { get; }
+    public abstract BusControl.BUS_ROUTE RouteToCU { get; }
+    public abstract BusControl.BUS_ROUTE RouteToGPA { get; }
+    public abstract BusControl.BUS_ROUTE RouteToGPB { get; }
+    public abstract BusControl.BUS_ROUTE RouteToALUx { get; }
+    public abstract BusControl.BUS_ROUTE RouteToALUy { get; }
+    public abstract BusControl.BUS_ROUTE RouteToALUz { get; }
+
     /**
      * @brief Initialises the Register.
      */

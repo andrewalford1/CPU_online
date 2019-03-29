@@ -280,29 +280,32 @@ public class ControlUnit : MonoBehaviour
         currentlyProcessing = true;
 
         //Copy the contents of register 'x' into ALUx.
+        buses.StartTransferringData(x.RouteToALUx);
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteX(x.ReadString());
-
+        buses.StopTransferringData(x.RouteToALUx);
 
         //Copy the Instruction Registers operand into ALUy.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteY(IR.OperandString());
-
+        buses.StopTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
 
         //Set the ALU's circuity.
-        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.SetAdditionCircuitry();
 
-
         //Compute ALUz.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.ComputeZ();
-
+        buses.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
 
         //Store the result into register x.
+        buses.StartTransferringData(x.RouteToALUz);
         yield return new WaitForSeconds(clock.GetSpeed());
         x.Write(ALU.ReadZ());
-        
+        buses.StopTransferringData(x.RouteToALUz);
+
         currentlyProcessing = false;
     }
 
@@ -324,24 +327,31 @@ public class ControlUnit : MonoBehaviour
         currentlyProcessing = true;
 
         //Copy the contents of register 'x' into ALUx.
+        buses.StartTransferringData(x.RouteToALUx);
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteX(x.ReadString());
+        buses.StopTransferringData(x.RouteToALUx);
 
         //Copy the contents of register 'y' into ALUy.
+        buses.StartTransferringData(y.RouteToALUy);
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteY(y.ReadString());
+        buses.StopTransferringData(y.RouteToALUy);
 
         //Set the ALU's circuity.
-        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.SetAdditionCircuitry();
 
         //Compute ALUz.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.ComputeZ();
+        buses.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
 
         //Store the result into register x.
+        buses.StartTransferringData(x.RouteToALUz);
         yield return new WaitForSeconds(clock.GetSpeed());
         x.Write(ALU.ReadZ());
+        buses.StopTransferringData(x.RouteToALUz);
 
         currentlyProcessing = false;
     }

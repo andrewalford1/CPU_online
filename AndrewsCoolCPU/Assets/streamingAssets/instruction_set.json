@@ -2,20 +2,63 @@
     "instructions" : [
         {
             "ID": 0,
+			"ID_HEX": "0000",
             "command" : "\\ADD #data,A",
             "description" :  "Add to reg. A an immediate oper."
         }, {
             "ID": 1,
+			"ID_HEX": "0001",
             "command" : "\\ADD #data,B",
             "description" :  "Add to reg. B an immediate oper."
         }, {
             "ID": 2,
+			"ID_HEX": "0002",
+            "command" : "\\ADD addr,A",
+            "description" :  "Add to reg. A from a direct addr."
+        }, {
+            "ID": 3,
+			"ID_HEX": "0003",
+            "command" : "\\ADD addr,B",
+            "description" :  "Add to reg. B from a direct addr."
+        }, {
+            "ID": 4,
+			"ID_HEX": "0004",
             "command" : "\\ADD A,B",
             "description" :  "Add B reg. to contents of A reg."
         }, {
-            "ID": 3,
+            "ID": 5,
+			"ID_HEX": "0005",
             "command" : "\\ADD B,A",
             "description" :  "Add A reg. to contents of B reg."
+        }, {
+            "ID": 6,
+			"ID_HEX": "0006",
+            "command" : "\\SUB  #data,A",
+            "description" :  "Subtract an immediate oper. from A reg"
+        }, {
+            "ID": 7,
+			"ID_HEX": "0007",
+            "command" : "\\SUB  #data,B",
+            "description" :  "Subtract an immediate oper. from B reg"
+        }, {
+            "ID": 8,
+			"ID_HEX": "0008",
+            "command" : "\\SUB  addr,A",
+            "description" :  "Subtract from reg. A a direct oper."
+        }, {
+            "ID": 9,
+			"ID_HEX": "0009",
+            "command" : "\\SUB  addr,B",
+            "description" :  "Subtract from reg. B a direct oper."
+        }, {
+            "ID": 10,
+			"ID_HEX": "000A",
+            "command" : "\\SUB  B,A",
+            "description" :  "Subtract from reg. A the contents of reg B."
+        }, {
+            "ID": 11,
+            "command" : "\\SUB  A,B",
+            "description" :  "Subtract from reg. B the contents of reg A."
         }
     ]
 }

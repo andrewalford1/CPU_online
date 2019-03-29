@@ -10,7 +10,7 @@ using UnityEngine.Networking;
  * @extends MonoBehaviour
  * @author  Andrew Alford
  * @date    20/03/2019
- * @version 1.2 - 27/03/2019
+ * @version 1.4 - 29/03/2019
  */
 public class ControlUnit : MonoBehaviour
 {
@@ -197,16 +197,52 @@ public class ControlUnit : MonoBehaviour
                 //Execute the current instruction.
                 switch(currentInstruction.ID) {
                     case (0):
-                        StartCoroutine(Instruction_ADD(GP_A));
+                        ALU.SetAdditionCircuitry();
+                        StartCoroutine(Instruction_IMMEDIATE_COMPUTE(GP_A));
                         break;
                     case (1):
-                        StartCoroutine(Instruction_ADD(GP_B));
+                        ALU.SetAdditionCircuitry();
+                        StartCoroutine(Instruction_IMMEDIATE_COMPUTE(GP_B));
                         break;
                     case (2):
-                        StartCoroutine(InstructionCoroutine_ADD(GP_A, GP_B));
+                        ALU.SetAdditionCircuitry();
+                        StartCoroutine(Instruction_DIRECT_COMPUTE(GP_A));
                         break;
                     case (3):
-                        StartCoroutine(InstructionCoroutine_ADD(GP_B, GP_A));
+                        ALU.SetAdditionCircuitry();
+                        StartCoroutine(Instruction_DIRECT_COMPUTE(GP_B));
+                        break;
+                    case (4):
+                        ALU.SetAdditionCircuitry();
+                        StartCoroutine(InstructionCoroutine_COMPUTE(GP_A, GP_B));
+                        break;
+                    case (5):
+                        ALU.SetAdditionCircuitry();
+                        StartCoroutine(InstructionCoroutine_COMPUTE(GP_B, GP_A));
+                        break;
+                    case (6):
+                        ALU.SetSubtractionCircuitry();
+                        StartCoroutine(Instruction_IMMEDIATE_COMPUTE(GP_A));
+                        break;
+                    case (7):
+                        ALU.SetSubtractionCircuitry();
+                        StartCoroutine(Instruction_IMMEDIATE_COMPUTE(GP_B));
+                        break;
+                    case (8):
+                        ALU.SetSubtractionCircuitry();
+                        StartCoroutine(Instruction_DIRECT_COMPUTE(GP_A));
+                        break;
+                    case (9):
+                        ALU.SetSubtractionCircuitry();
+                        StartCoroutine(Instruction_DIRECT_COMPUTE(GP_B));
+                        break;
+                    case (10):
+                        ALU.SetSubtractionCircuitry();
+                        StartCoroutine(InstructionCoroutine_COMPUTE(GP_A, GP_B));
+                        break;
+                    case (11):
+                        ALU.SetSubtractionCircuitry();
+                        StartCoroutine(InstructionCoroutine_COMPUTE(GP_B, GP_A));
                         break;
                 }
             }
@@ -279,12 +315,11 @@ public class ControlUnit : MonoBehaviour
     }
 
     /**
-     * @brief A coroutine to perform a ADD instruction 
-     *        at the desired clockspeed.
-     * @param x - The register to be added to.
+     * @brief A coroutine to compute a register
+     *        using immediate addressing.
+     * @param x - The register to compute.
      */
-    IEnumerator Instruction_ADD(Register x) {
-
+    IEnumerator Instruction_IMMEDIATE_COMPUTE(Register x) {
         currentlyProcessing = true;
 
         //Copy the contents of register 'x' into ALUx.
@@ -293,14 +328,11 @@ public class ControlUnit : MonoBehaviour
         ALU.WriteX(x.ReadString());
         buses.StopTransferringData(x.RouteToALUx);
 
-        //Copy the Instruction Registers operand into ALUy.
+        //Copy the IRs operand into ALUy.
         buses.StartTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteY(IR.OperandString());
         buses.StopTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
-
-        //Set the ALU's circuity.
-        ALU.SetAdditionCircuitry();
 
         //Compute ALUz.
         buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
@@ -318,12 +350,65 @@ public class ControlUnit : MonoBehaviour
     }
 
     /**
-     * @brief A coroutine to perform a ADD instruction 
-     *        at the desired clockspeed.
-     * @param x - The register to be added to.
+     * @brief A coroutine to compute a register using
+     *        direct addressing.
+     * @param x - The register to compute.
+     */
+    IEnumerator Instruction_DIRECT_COMPUTE(Register x) {
+        currentlyProcessing = true;
+
+        //Copy the IRs operand into MAR.
+        buses.StartTransferringData(IR.RouteToMAR);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        MAR.Write(IR.OperandString());
+        buses.StopTransferringData(IR.RouteToMAR);
+
+        //Set the memory pointer to the value of MAR.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.MAR_MEMORY);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        memory.SetPointer(MAR.ReadUnsigned());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.MAR_MEMORY);
+
+        //Write the contents of the memory address being pointed to into MDR.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.MDR_MEMORY);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        MDR.Write(memory.ReadFromMemorySlot());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.MDR_MEMORY);
+
+        //Send the contends of MDR to the ALU.
+        buses.StartTransferringData(MDR.RouteToALUy);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.WriteY(MDR.ReadString());
+        buses.StopTransferringData(MDR.RouteToALUy);
+
+        //Send the contents of register x to the ALU.
+        buses.StartTransferringData(MDR.RouteToALUx);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.WriteX(x.ReadString());
+        buses.StopTransferringData(MDR.RouteToALUx);
+
+        //Compute ALUz.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.ComputeZ();
+        buses.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
+
+        //Store the result into register x.
+        buses.StartTransferringData(x.RouteToALUz);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        x.Write(ALU.ReadZ());
+        buses.StopTransferringData(x.RouteToALUz);
+
+        currentlyProcessing = false;
+    }
+
+    /**
+     * @brief A coroutine to perform a compute two
+     *        registers to the first register
+     * @param x - The register to be used.
      * @param y - The other register to be used.
      */
-    IEnumerator InstructionCoroutine_ADD(Register x, Register y) {
+    IEnumerator InstructionCoroutine_COMPUTE(Register x, Register y) {
         currentlyProcessing = true;
 
         //Copy the contents of register 'x' into ALUx.
@@ -337,9 +422,6 @@ public class ControlUnit : MonoBehaviour
         yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteY(y.ReadString());
         buses.StopTransferringData(y.RouteToALUy);
-
-        //Set the ALU's circuity.
-        ALU.SetAdditionCircuitry();
 
         //Compute ALUz.
         buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);

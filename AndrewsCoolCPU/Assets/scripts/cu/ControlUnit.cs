@@ -196,10 +196,18 @@ public class ControlUnit : MonoBehaviour
             if (currentInstruction != null) {
                 //Execute the current instruction.
                 switch(currentInstruction.ID) {
-                    case (0): Add(GP_A); break;
-                    case (1): Add(GP_B); break;
-                    case (2): Add(GP_A, GP_B); break;
-                    case (3): Add(GP_B, GP_A); break;
+                    case (0):
+                        StartCoroutine(Instruction_ADD(GP_A));
+                        break;
+                    case (1):
+                        StartCoroutine(Instruction_ADD(GP_B));
+                        break;
+                    case (2):
+                        StartCoroutine(InstructionCoroutine_ADD(GP_A, GP_B));
+                        break;
+                    case (3):
+                        StartCoroutine(InstructionCoroutine_ADD(GP_B, GP_A));
+                        break;
                 }
             }
         }
@@ -275,7 +283,7 @@ public class ControlUnit : MonoBehaviour
      *        at the desired clockspeed.
      * @param x - The register to be added to.
      */
-    IEnumerator InstructionCoroutine_ADD(Register x) {
+    IEnumerator Instruction_ADD(Register x) {
 
         currentlyProcessing = true;
 
@@ -307,14 +315,6 @@ public class ControlUnit : MonoBehaviour
         buses.StopTransferringData(x.RouteToALUz);
 
         currentlyProcessing = false;
-    }
-
-    /**
-     * @brief Adds the data held in IR to a given register.
-     * @param x - The register to be added to.
-     */
-    private void Add(Register x) {
-        StartCoroutine(InstructionCoroutine_ADD(x));
     }
 
     /**
@@ -354,9 +354,5 @@ public class ControlUnit : MonoBehaviour
         buses.StopTransferringData(x.RouteToALUz);
 
         currentlyProcessing = false;
-    }
-
-    private void Add(Register x, Register y) {
-        StartCoroutine(InstructionCoroutine_ADD(x, y));
     }
 }

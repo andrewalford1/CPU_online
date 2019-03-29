@@ -160,11 +160,19 @@ public class ControlUnit : MonoBehaviour
     IEnumerator DecodeCoroutine()
     {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Copy the contents of the MDR into the IR for decoding.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.MDR_IR);
+        yield return new WaitForSeconds(clock.GetSpeed());
         IR.Write(MDR.ReadString());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.MDR_IR);
+
+        //Decode IR's opcode.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.IR_CU);
         yield return new WaitForSeconds(clock.GetSpeed());
         SetCurrentInstructionFromCU(IR.Opcode());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.IR_CU);
+
         currentlyProcessing = false;
     }
 
@@ -188,10 +196,18 @@ public class ControlUnit : MonoBehaviour
             if (currentInstruction != null) {
                 //Execute the current instruction.
                 switch(currentInstruction.ID) {
-                    case (0): Add(GP_A); break;
-                    case (1): Add(GP_B); break;
-                    case (2): Add(GP_A, GP_B); break;
-                    case (3): Add(GP_B, GP_A); break;
+                    case (0):
+                        StartCoroutine(Instruction_ADD(GP_A));
+                        break;
+                    case (1):
+                        StartCoroutine(Instruction_ADD(GP_B));
+                        break;
+                    case (2):
+                        StartCoroutine(InstructionCoroutine_ADD(GP_A, GP_B));
+                        break;
+                    case (3):
+                        StartCoroutine(InstructionCoroutine_ADD(GP_B, GP_A));
+                        break;
                 }
             }
         }
@@ -267,32 +283,38 @@ public class ControlUnit : MonoBehaviour
      *        at the desired clockspeed.
      * @param x - The register to be added to.
      */
-    IEnumerator InstructionCoroutine_ADD(Register x) {
+    IEnumerator Instruction_ADD(Register x) {
+
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Copy the contents of register 'x' into ALUx.
+        buses.StartTransferringData(x.RouteToALUx);
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteX(x.ReadString());
-        yield return new WaitForSeconds(clock.GetSpeed());
+        buses.StopTransferringData(x.RouteToALUx);
+
         //Copy the Instruction Registers operand into ALUy.
-        ALU.WriteY(IR.OperandString());
+        buses.StartTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
         yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.WriteY(IR.OperandString());
+        buses.StopTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
+
         //Set the ALU's circuity.
         ALU.SetAdditionCircuitry();
-        yield return new WaitForSeconds(clock.GetSpeed());
-        //Compute ALUz.
-        ALU.ComputeZ();
-        yield return new WaitForSeconds(clock.GetSpeed());
-        //Store the result into register x.
-        x.Write(ALU.ReadZ());
-        currentlyProcessing = false;
-    }
 
-    /**
-     * @brief Adds the data held in IR to a given register.
-     * @param x - The register to be added to.
-     */
-    private void Add(Register x) {
-        StartCoroutine(InstructionCoroutine_ADD(x));
+        //Compute ALUz.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.ComputeZ();
+        buses.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
+
+        //Store the result into register x.
+        buses.StartTransferringData(x.RouteToALUz);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        x.Write(ALU.ReadZ());
+        buses.StopTransferringData(x.RouteToALUz);
+
+        currentlyProcessing = false;
     }
 
     /**
@@ -303,26 +325,34 @@ public class ControlUnit : MonoBehaviour
      */
     IEnumerator InstructionCoroutine_ADD(Register x, Register y) {
         currentlyProcessing = true;
-        yield return new WaitForSeconds(clock.GetSpeed());
+
         //Copy the contents of register 'x' into ALUx.
+        buses.StartTransferringData(x.RouteToALUx);
+        yield return new WaitForSeconds(clock.GetSpeed());
         ALU.WriteX(x.ReadString());
-        yield return new WaitForSeconds(clock.GetSpeed());
+        buses.StopTransferringData(x.RouteToALUx);
+
         //Copy the contents of register 'y' into ALUy.
-        ALU.WriteY(y.ReadString());
+        buses.StartTransferringData(y.RouteToALUy);
         yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.WriteY(y.ReadString());
+        buses.StopTransferringData(y.RouteToALUy);
+
         //Set the ALU's circuity.
         ALU.SetAdditionCircuitry();
-        yield return new WaitForSeconds(clock.GetSpeed());
-        //Compute ALUz.
-        ALU.ComputeZ();
-        yield return new WaitForSeconds(clock.GetSpeed());
-        //Store the result into register x.
-        x.Write(ALU.ReadZ());
-        yield return new WaitForSeconds(clock.GetSpeed());
-        currentlyProcessing = false;
-    }
 
-    private void Add(Register x, Register y) {
-        StartCoroutine(InstructionCoroutine_ADD(x, y));
+        //Compute ALUz.
+        buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        ALU.ComputeZ();
+        buses.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
+
+        //Store the result into register x.
+        buses.StartTransferringData(x.RouteToALUz);
+        yield return new WaitForSeconds(clock.GetSpeed());
+        x.Write(ALU.ReadZ());
+        buses.StopTransferringData(x.RouteToALUz);
+
+        currentlyProcessing = false;
     }
 }

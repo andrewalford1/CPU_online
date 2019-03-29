@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 /**
- * @brief Class representing the Arithmetic Logic Unit.
+ * @brief   Class representing the Arithmetic Logic Unit.
  * @extends MonoBehaviour
- * @author Andrew Alford
- * @date 03/03/2019
+ * @author  Andrew Alford
+ * @date    03/03/2019
  * @version 1.4 - 27/03/2019
  */
 public class ArithmeticLogicUnit : MonoBehaviour {

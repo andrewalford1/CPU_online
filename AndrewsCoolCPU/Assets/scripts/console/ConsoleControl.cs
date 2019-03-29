@@ -3,13 +3,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /**
- * @brief Class containing the controls for the CPUs console.
+ * @brief   Class containing the controls for the CPUs console.
  * @extends MonoBehaviour
- * @author Andrew Alford
- * @date 06/03/2019
- * @version 1.4 - 25/03/2019
+ * @author  Andrew Alford
+ * @date    06/03/2019
+ * @version 1.5 - 29/03/2019
  */
 public class ConsoleControl : MonoBehaviour {
+
     //[CONSOLE] The single instance of this object.
     public static ConsoleControl CONSOLE;
 
@@ -106,7 +107,7 @@ public class ConsoleControl : MonoBehaviour {
             if (instruction != null) {
                 LogCommand(text);
                 CU.SetCurrentInstructionFromConsole(instruction.ID);
-                CU.Execute();
+                StartCoroutine(CU.ExecuteCycle());
                 return true;
             }
         } else {
@@ -127,15 +128,15 @@ public class ConsoleControl : MonoBehaviour {
         switch (text) {
             case ("\\FETCH"):
                 LogCommand(text);
-                CU.Fetch();
+                StartCoroutine(CU.FetchCycle());
                 return true;
             case ("\\DECODE"):
                 LogCommand(text);
-                CU.Decode();
+                StartCoroutine(CU.DecodeCycle());
                 return true;
             case ("\\EXECUTE"):
                 LogCommand(text);
-                CU.Execute();
+                StartCoroutine(CU.ExecuteCycle());
                 return true;
             case ("\\RESET"):
                 LogCommand(text);

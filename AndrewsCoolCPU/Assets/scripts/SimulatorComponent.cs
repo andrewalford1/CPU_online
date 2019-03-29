@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 /**
- * @brief Abstract class representing a simulator component.
+ * @brief   Abstract class representing a simulator component.
  * @extends ScriptableObject
- * @author Andrew Alford
- * @date 12/02/2019
+ * @author  Andrew Alford
+ * @date    12/02/2019
  * @version 1.0 - 12/02/2019
  */
 public class SimulatorComponent : MonoBehaviour
@@ -18,8 +16,7 @@ public class SimulatorComponent : MonoBehaviour
      * @brief Retrieves the ID of the register.
      * @return Returns the registers ID.
      */
-    public string GetID()
-    {
+    public string GetID() {
         return id;
     }
 }

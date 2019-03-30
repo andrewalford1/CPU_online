@@ -52,21 +52,21 @@ public class ArithmeticLogicUnit : MonoBehaviour {
     public void Start() {
         //Delagate input validation on ALU input fields.
         input_x.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input_y.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input_z.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input_x.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input_x);
+            InputValidation.FillBlanks_Register(input_x);
             WriteX(input_x.text);
         });
         input_y.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input_y);
+            InputValidation.FillBlanks_Register(input_y);
             WriteY(input_y.text);
         });
         input_z.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input_z);
+            InputValidation.FillBlanks_Register(input_z);
         });
 
         //Wipe the slate clean after fields have been altered.

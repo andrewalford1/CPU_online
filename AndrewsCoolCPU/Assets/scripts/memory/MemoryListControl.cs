@@ -57,7 +57,7 @@ public class MemoryListControl : MonoBehaviour {
             //Added input validation.
             memoryLocationsUI[i].GetComponentsInChildren<InputField>()[0].onValidateInput += 
                 delegate (string input, int charIndex, char addedChar) 
-                { return InputValidation.validateAsHex(addedChar); };
+                { return InputValidation.ValidateAsHex(addedChar); };
         }
 
         //[loactionIndex] Used to point to a specific place in memory.
@@ -69,7 +69,7 @@ public class MemoryListControl : MonoBehaviour {
             memoryLocationsUI[locationIndex].GetComponentsInChildren<InputField>()[0].onEndEdit.AddListener(
                 delegate
                 {
-                    InputValidation.fillBlanks_Register(
+                    InputValidation.FillBlanks_Register(
              memoryLocationsUI[slot.GetID()].GetComponentsInChildren<InputField>()[0]);
                 }
             );

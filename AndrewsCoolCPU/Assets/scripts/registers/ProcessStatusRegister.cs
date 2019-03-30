@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 /**
- * @brief Class representing the Process Status Register.
+ * @brief   Class representing the Process Status Register.
  * @extends MonoBehaviour
- * @author Andrew Alford
- * @date 05/03/2019
+ * @author  Andrew Alford
+ * @date    05/03/2019
  * @version 1.1 - 05/03/2019
  */
 public class ProcessStatusRegister : MonoBehaviour

@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
 /**
- * @brief Class representing the program counter.
+ * @brief   Class representing the program counter.
  * @extends Register
- * @author Andrew Alford
- * @date 28/02/2019
+ * @author  Andrew Alford
+ * @date    28/02/2019
  * @version 1.3 - 29/03/2019
  */
 public class ProgramCounter : Register
@@ -38,9 +35,9 @@ public class ProgramCounter : Register
 
         //Delagate input validation
         input.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input);
+            InputValidation.FillBlanks_Register(input);
             ValidateUserInput(input);
             Write(input.text);
         });

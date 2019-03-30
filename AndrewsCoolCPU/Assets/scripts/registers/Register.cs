@@ -4,10 +4,10 @@ using System;
 
 
 /**
- * @brief Abstract class representing a register.
+ * @brief   Abstract class representing a register.
  * @extends SimulatorComponent
- * @author Andrew Alford
- * @date 12/02/2019
+ * @author  Andrew Alford
+ * @date    12/02/2019
  * @version 4.2 - 27/03/2019
  */
 public abstract class Register : SimulatorComponent {
@@ -48,9 +48,9 @@ public abstract class Register : SimulatorComponent {
 
         //Delagate input validation
         input.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input);
+            InputValidation.FillBlanks_Register(input);
             Write(input.text);
         });
         Write(input.text);

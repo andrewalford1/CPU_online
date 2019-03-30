@@ -158,8 +158,12 @@ public class ArithmeticLogicUnit : MonoBehaviour {
         Debug.Log("COMPUTING Z: - \n" + z.ToString());
 
         input_z.text = z.GetHex();
+    }
 
-        //Update the PSR with the value of Z.
+    /**
+     * @brief Upates the PSR with the value of ALU z.
+     */
+    public void SetPSR() {
         z.SetPSR(PSR);
     }
 

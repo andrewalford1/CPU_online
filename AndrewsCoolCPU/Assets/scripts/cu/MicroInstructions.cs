@@ -256,9 +256,11 @@ public class MicroInstructions : MonoBehaviour
      */
     public IEnumerator ComputeALUz()
     {
+        ALU.ComputeZ();
+
         busSystem.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
         yield return new WaitForSeconds(clock.GetSpeed());
-        ALU.ComputeZ();
+        ALU.SetPSR();
         busSystem.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
     }
 

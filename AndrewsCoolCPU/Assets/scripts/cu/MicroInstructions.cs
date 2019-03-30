@@ -6,7 +6,7 @@ using UnityEngine;
  * @extends MonoBehaviour
  * @author  Andrew Alford
  * @date    29/03/2019
- * @version 1.0 - 29/03/2019
+ * @version 1.1 - 30/03/2019
  */
 public class MicroInstructions : MonoBehaviour
 {
@@ -127,6 +127,14 @@ public class MicroInstructions : MonoBehaviour
         yield return new WaitForSeconds(clock.GetSpeed());
         memory.WriteToMemorySlot(MDR.ReadString());
         busSystem.StopTransferringData(BusControl.BUS_ROUTE.MDR_MEMORY);
+    }
+
+    /**
+     * @brief Uses the data in IR to perform a memory fetch.
+     */
+    public IEnumerator MemoryDirectFetch() {
+        yield return ReadIROperand(MAR);
+        yield return MemoryRead();
     }
 
     /**
@@ -350,6 +358,38 @@ public class MicroInstructions : MonoBehaviour
             case (0x11):
                 yield return Instruction_COMPARE(GPB, GPA);
                 break;
+            case (0x12):
+                yield return ReadIROperand(GPA);
+                break;
+            case (0x13):
+                yield return ReadIROperand(GPB);
+                break;
+            case (0x14):
+                yield return MemoryDirectFetch();
+                yield return WriteToGPA(MDR);
+                break;
+            case (0x15):
+                yield return MemoryDirectFetch();
+                yield return WriteToGPB(MDR);
+                break;
+            case (0x16):
+                yield return WriteToGPA(GPB);
+                break;
+            case (0x17):
+                yield return WriteToGPB(GPB);
+                break;
+            case (0x18):
+                yield return Instruction_moveToMemory_DIRECT(GPA);
+                break;
+            case (0x19):
+                yield return Instruction_moveToMemory_DIRECT(GPB);
+                break;
+            case (0x1A):
+                yield return Instruction_moveToMemory_INDIRECT(GPA);
+                break;
+            case (0x1B):
+                yield return Instruction_moveToMemory_INDIRECT(GPB);
+                break;
         }
     }
 
@@ -371,8 +411,7 @@ public class MicroInstructions : MonoBehaviour
      * @param x - The register to compute.
      */
     public IEnumerator Instruction_DIRECT_COMPUTE(Register x) {
-        yield return ReadIROperand(MAR);
-        yield return MemoryRead();
+        yield return MemoryDirectFetch();
         yield return WriteToALUy(MDR);
         yield return WriteToALUx(x);
         yield return ComputeALUz();
@@ -412,8 +451,7 @@ public class MicroInstructions : MonoBehaviour
      * @param x - The register to compare data with.
      */
     public IEnumerator Instruction_DIRECT_COMPARE(Register x) {
-        yield return ReadIROperand(MAR);
-        yield return MemoryRead();
+        yield return MemoryDirectFetch();
         ALU.SetSubtractionCircuitry();
         yield return WriteToALUy(MDR);
         yield return WriteToALUx(x);
@@ -433,4 +471,27 @@ public class MicroInstructions : MonoBehaviour
         yield return ComputeALUz();
     }
 
+    /**
+     * @brief Moves data directly into memory.
+     *        (Address is calculated from the data in IR).
+     * @param x - Holds the content to write to memory.
+     */
+    public IEnumerator Instruction_moveToMemory_DIRECT(Register x) {
+        yield return ReadIROperand(MAR);
+        yield return WriteToMDR(x);
+        yield return MemoryWrite();
+    }
+
+    /**
+     * @brief Moves data into memory using indirect addressing.
+     *        (Address are calculated from the data in IR).
+     * @param x - Holds the content to write to memory.
+     */
+    public IEnumerator Instruction_moveToMemory_INDIRECT(Register x) {
+        yield return MemoryDirectFetch();       
+        yield return WriteToIR(MDR);
+        yield return WriteToMDR(x);
+        yield return ReadIROperand(MAR);
+        yield return MemoryWrite();
+    }
 }

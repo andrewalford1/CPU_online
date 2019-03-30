@@ -107,6 +107,66 @@
       "ID_HEX": "0011",
       "command": "\\CMP A,B",
       "description": "Compare B and A reg"
+    },
+    {
+      "ID": 18,
+      "ID_HEX": "0012",
+      "command": "\\MOVE #data,A",
+      "description": "Move an immediate oper. into A"
+    },
+    {
+      "ID": 19,
+      "ID_HEX": "0013",
+      "command": "\\MOVE #data,B",
+      "description": "Move an immediate oper. into B"
+    },
+    {
+      "ID": 20,
+      "ID_HEX": "0014",
+      "command": "\\MOVE addr,A",
+      "description": "Load reg. A from a direct addr"
+    },
+    {
+      "ID": 21,
+      "ID_HEX": "0015",
+      "command": "\\MOVE addr,B",
+      "description": "Load reg. B from a direct addr"
+    },
+    {
+      "ID": 22,
+      "ID_HEX": "0016",
+      "command": "\\MOVE B,A",
+      "description": "Move B reg. to A reg"
+    },
+    {
+      "ID": 23,
+      "ID_HEX": "0017",
+      "command": "\\MOVE A,B",
+      "description": "Move A reg. to B reg"
+    },
+    {
+      "ID": 24,
+      "ID_HEX": "0018",
+      "command": "\\MOVE A,addr",
+      "description": "Store the A reg. in memory at a direct addr"
+    },
+    {
+      "ID": 25,
+      "ID_HEX": "0019",
+      "command": "\\MOVE B,addr",
+      "description": "Store the B reg. in memory at a direct addr"
+    },
+    {
+      "ID": 26,
+      "ID_HEX": "001A",
+      "command": "\\MOVE A,(addr)",
+      "description": "Store reg. A at a mem. indirect addr"
+    },
+    {
+      "ID": 27,
+      "ID_HEX": "001B",
+      "command": "\\MOVE B,(addr)",
+      "description": "Store reg. B at a mem. indirect addr"
     }
   ]
 }

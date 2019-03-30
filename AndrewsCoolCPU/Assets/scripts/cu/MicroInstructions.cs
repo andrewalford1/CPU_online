@@ -67,7 +67,7 @@ public class MicroInstructions : MonoBehaviour
      * @param register - The register to be read from.
      */
     public IEnumerator WriteToPC(Register register) {
-        if(PC.Equals(register)) {
+        if (PC.Equals(register)) {
             busSystem.StartTransferringData(BusControl.BUS_ROUTE.PC_PC);
             yield return new WaitForSeconds(clock.GetSpeed());
             PC.Increment();
@@ -284,53 +284,71 @@ public class MicroInstructions : MonoBehaviour
      */
     public IEnumerator ExecuteInstrucion(int id) {
         switch (id) {
-            case (0):
+            case (0x00):
                 ALU.SetAdditionCircuitry();
                 yield return Instruction_IMMEDIATE_COMPUTE(GPA);
                 break;
-            case (1):
+            case (0x01):
                 ALU.SetAdditionCircuitry();
                 yield return Instruction_IMMEDIATE_COMPUTE(GPB);
                 break;
-            case (2):
+            case (0x02):
                 ALU.SetAdditionCircuitry();
                 yield return Instruction_DIRECT_COMPUTE(GPA);
                 break;
-            case (3):
+            case (0x03):
                 ALU.SetAdditionCircuitry();
                 yield return Instruction_DIRECT_COMPUTE(GPB);
                 break;
-            case (4):
+            case (0x04):
                 ALU.SetAdditionCircuitry();
-                yield return InstructionCoroutine_COMPUTE(GPA, GPB);
+                yield return Instruction_COMPUTE(GPA, GPB);
                 break;
-            case (5):
+            case (0x05):
                 ALU.SetAdditionCircuitry();
-                yield return InstructionCoroutine_COMPUTE(GPB, GPA);
+                yield return Instruction_COMPUTE(GPB, GPA);
                 break;
-            case (6):
+            case (0x06):
                 ALU.SetSubtractionCircuitry();
                 yield return Instruction_IMMEDIATE_COMPUTE(GPA);
                 break;
-            case (7):
+            case (0x07):
                 ALU.SetSubtractionCircuitry();
                 yield return Instruction_IMMEDIATE_COMPUTE(GPB);
                 break;
-            case (8):
+            case (0x08):
                 ALU.SetSubtractionCircuitry();
                 yield return Instruction_DIRECT_COMPUTE(GPA);
                 break;
-            case (9):
+            case (0x09):
                 ALU.SetSubtractionCircuitry();
                 yield return Instruction_DIRECT_COMPUTE(GPB);
                 break;
-            case (10):
+            case (0x0A):
                 ALU.SetSubtractionCircuitry();
-                yield return InstructionCoroutine_COMPUTE(GPA, GPB);
+                yield return Instruction_COMPUTE(GPA, GPB);
                 break;
-            case (11):
+            case (0x0B):
                 ALU.SetSubtractionCircuitry();
-                yield return InstructionCoroutine_COMPUTE(GPB, GPA);
+                yield return Instruction_COMPUTE(GPB, GPA);
+                break;
+            case (0x0C):
+                yield return Instruction_IMMEDIATE_COMPARE(GPA);
+                break;
+            case (0x0D):
+                yield return Instruction_IMMEDIATE_COMPARE(GPB);
+                break;
+            case (0x0E):
+                yield return Instruction_DIRECT_COMPARE(GPA);
+                break;
+            case (0x0F):
+                yield return Instruction_DIRECT_COMPARE(GPB);
+                break;
+            case (0x10):
+                yield return Instruction_COMPARE(GPA, GPB);
+                break;
+            case (0x11):
+                yield return Instruction_COMPARE(GPB, GPA);
                 break;
         }
     }
@@ -340,7 +358,7 @@ public class MicroInstructions : MonoBehaviour
      *        using immediate addressing.
      * @param x - The register to compute.
      */
-    public IEnumerator Instruction_IMMEDIATE_COMPUTE(Register x) { 
+    public IEnumerator Instruction_IMMEDIATE_COMPUTE(Register x) {
         yield return WriteToALUx(x);
         yield return ReadIROperandToALUy();
         yield return ComputeALUz();
@@ -367,11 +385,52 @@ public class MicroInstructions : MonoBehaviour
      * @param x - The register to be used.
      * @param y - The other register to be used.
      */
-    public IEnumerator InstructionCoroutine_COMPUTE(Register x, Register y) {
+    public IEnumerator Instruction_COMPUTE(Register x, Register y) {
         yield return WriteToALUx(x);
         yield return WriteToALUy(y);
         yield return ComputeALUz();
         yield return ReadFromALUz(x);
+    }
+
+    /**
+     * @brief A coroutine to compare a register 
+     *        using immediate addressing.
+     *        (Result is stored PSR).
+     * @param x - The register to compare data with.
+     */
+    public IEnumerator Instruction_IMMEDIATE_COMPARE(Register x) {
+        ALU.SetSubtractionCircuitry();
+        yield return WriteToALUx(x);
+        yield return ReadIROperandToALUy();
+        yield return ComputeALUz();
+    }
+
+    /**
+     * @brief A coroutine to compare a register 
+     *        using direct addressing.
+     *        (Result is stored PSR).
+     * @param x - The register to compare data with.
+     */
+    public IEnumerator Instruction_DIRECT_COMPARE(Register x) {
+        yield return ReadIROperand(MAR);
+        yield return MemoryRead();
+        ALU.SetSubtractionCircuitry();
+        yield return WriteToALUy(MDR);
+        yield return WriteToALUx(x);
+        yield return ComputeALUz();
+    }
+
+    /**
+     * @brief Compares the contents of two registers.
+     *        (Result is stored PSR).
+     * @param x - The first register to be compared.
+     * @param y - The second register to be compared.
+     */
+    public IEnumerator Instruction_COMPARE(Register x, Register y) {
+        ALU.SetSubtractionCircuitry();
+        yield return WriteToALUx(x);
+        yield return WriteToALUy(y);
+        yield return ComputeALUz();
     }
 
 }

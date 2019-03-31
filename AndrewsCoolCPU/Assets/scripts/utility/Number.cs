@@ -2,13 +2,12 @@
 using UnityEngine;
 
 /**
- * @brief Defines a Number to be used in the simulator.
- * @author Andrew Alford
- * @date 14/03/2019
- * @version 2.1 - 21/03/2019
+ * @brief   Defines a Number to be used in the simulator.
+ * @author  Andrew Alford
+ * @date    14/03/2019
+ * @version 2.2 - 30/03/2019
  */
-public class Number
-{
+public class Number {
     //[DEFUALT] The defualt value of the Number.
     private const int DEFUALT = 0x0000;
     //[value] The current value of the Number.
@@ -25,8 +24,7 @@ public class Number
      * @brief Constructor for a Number.
      * @param startingValue - The initial value of the Number.
      */
-    public Number(int startingValue = DEFUALT)
-    {
+    public Number(int startingValue = DEFUALT) {
         //Initialise the number.
         SetNumber(startingValue);
     }
@@ -36,8 +34,7 @@ public class Number
      *        of this Number.
      * @param PSR - The PSR to be set.
      */
-    public void SetPSR(ProcessStatusRegister PSR)
-    {
+    public void SetPSR(ProcessStatusRegister PSR) {
         PSR.SetFlag(ProcessStatusRegister.FLAGS.ZERO, IsZero());
         PSR.SetFlag(ProcessStatusRegister.FLAGS.NEGATIVE, IsNegative());
         PSR.SetFlag(ProcessStatusRegister.FLAGS.OVERFLOW, IsOverflow());
@@ -47,121 +44,76 @@ public class Number
     /**
      * @returns the value as a signed short.
      */
-    public short GetSigned()
-    {
-        return value;
-    }
+    public short GetSigned() => value;
 
     /**
      * @returns the value as an unsigned short.
      */
-    public ushort GetUnsigned()
-    {
-        return (ushort)value;
-    }
+    public ushort GetUnsigned() => (ushort)value;
 
     /**
      * @returns the value as a signed string.
      */
-    public string GetSignedString()
-    {
-        return InputValidation.FillBlanks(GetSigned().ToString("X"), 4);
-    }
+    public string GetSignedString() => InputValidation.FillBlanks(GetSigned().ToString("X"), 4);
 
     /**
      * @returns the value as an unsigned string.
      */
-    public string GetUnsignedString()
-    {
-        return InputValidation.FillBlanks(GetUnsigned().ToString("X"), 4);
-    }
+    public string GetUnsignedString() => InputValidation.FillBlanks(GetUnsigned().ToString("X"), 4);
 
     /**
      * @returns the value as a signed string in hexadecimal format.
      */
-    public string GetHex()
-    {
-        return InputValidation.FillBlanks(
-            value.ToString("X"),
-            4
-        );
-    }
+    public string GetHex() => InputValidation.FillBlanks(value.ToString("X"), 4);
 
     /**
      * @brief Allows the number to be set.
      * @param value - The value to set the number.
      */
-    public void SetNumber(int value)
-    {
-        this.value = (short)value;
-    }
+    public void SetNumber(int value) => this.value = (short)value;
 
     /**
      * @brief Allowd the number to be set.
      * @param hexValue - The value to set the number.
      */
-    public void SetNumber(string hexValue)
-    {
-        SetNumber(Convert.ToInt16(hexValue, 16));
-    }
+    public void SetNumber(string hexValue) => SetNumber(Convert.ToInt16(hexValue, 16));
 
     /**
      * @brief Resets the number to it's defualt value.
      */
-    public void Reset()
-    {
-        value = DEFUALT;
-    }
+    public void Reset() => value = DEFUALT;
 
     /**
      * @returns 'true' if the number is the result of a carry.
      */
-    public bool IsCarry()
-    {
-        return carry;
-    }
+    public bool IsCarry() => carry;
 
     /**
      * @brief Allows the carry flag to be set.
      * @param flag - The new value of the carry flag.
      */
-    public void SetCarry(bool flag)
-    {
-        carry = flag;
-    }
+    public void SetCarry(bool flag) => carry = flag;
 
     /**
      * @returns 'true' if the number is equal to zero.
      */
-    public bool IsZero()
-    {
-        return value == 0x0000;
-    }
+    public bool IsZero() => value == 0x0000;
 
     /**
      * @returns 'true' if the number is negative.
      */
-    public bool IsNegative()
-    {
-        return value < 0x0000;
-    }
+    public bool IsNegative() => value < 0x0000;
 
     /**
      * @returns 'true' if the number is the result of an overflow or underflow.
      */
-    public bool IsOverflow()
-    {
-        return overflow;
-    }
+    public bool IsOverflow() => overflow;
 
     /**
      * @brief Allows the overflow flag to be set.
      * @param flag - The new value for the overflow flag.
      */
-    public void SetOverflow(bool flag)
-    {
-        overflow = flag;
-    }
+    public void SetOverflow(bool flag) => overflow = flag;
 
     /**
      * @brief Adds two Numbers together.
@@ -205,10 +157,7 @@ public class Number
      * @brief Adds this Number to another Number.
      * @param otherNumber - The Number to add to this Number.
      */
-    public void Add(Number otherNumber)
-    {
-        Clone(Add(this, otherNumber));
-    }
+    public void Add(Number otherNumber) => Clone(Add(this, otherNumber));
 
     /**
      * @brief Subtracts one Number from another Number.
@@ -237,10 +186,7 @@ public class Number
      * @brief Subtracts this Number from another Number.
      * @param otherNumber - The Number to be subtracted from this Number.
      */
-    public void Subtract(Number otherNumber)
-    {
-        Clone(Subtract(this, otherNumber));
-    }
+    public void Subtract(Number otherNumber) => Clone(Subtract(this, otherNumber));
 
     /**
      * @brief Multiplies two Numbers together.
@@ -274,20 +220,14 @@ public class Number
      * @brief Multiplies this Numuber with another Number.
      * @param otherNumber - The Number to be multiplied with this Number.
      */
-    public void Multiply(Number otherNumber)
-    {
-        Clone(Multiply(this, otherNumber));
-    }
+    public void Multiply(Number otherNumber) => Clone(Multiply(this, otherNumber));
 
     /**
      * @brief Divides two Numbers.
      * @param x - The first Number in the calculation.
      * @param y - The second Number in the calculation.
      */
-    public static Number Divide(Number x, Number y)
-    {
-        return new Number(x.value / y.value);
-    }
+    public static Number Divide(Number x, Number y) => new Number(x.value / y.value);
 
     /**
      * @brief Divides this Number by another Number.
@@ -313,16 +253,13 @@ public class Number
      * @reutrns all the information about this Number 
      *          in string format.
      */
-    public override string ToString()
-    {
-        return  "\n" +
-                "hex:\t"        + GetHex()      + "\n" +
-                "signed:\t"     + GetSigned()   + "\n" +
-                "unsigned:\t"   + GetUnsigned() + "\n" +
-                "Carry:\t"      + IsCarry()     + "\n" +
-                "Zero:\t"       + IsZero()      + "\n" +
-                "Negative:\t"   + IsNegative()  + "\n" +
-                "Overflow:\t"   + IsOverflow()  + "\n";
-    }
+    public override string ToString() => "\n" +
+                "hex:\t" + GetHex() + "\n" +
+                "signed:\t" + GetSigned() + "\n" +
+                "unsigned:\t" + GetUnsigned() + "\n" +
+                "Carry:\t" + IsCarry() + "\n" +
+                "Zero:\t" + IsZero() + "\n" +
+                "Negative:\t" + IsNegative() + "\n" +
+                "Overflow:\t" + IsOverflow() + "\n";
 }
 

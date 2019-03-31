@@ -1,13 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 /**
- * @brief Class representing the Arithmetic Logic Unit.
+ * @brief   Class representing the Arithmetic Logic Unit.
  * @extends MonoBehaviour
- * @author Andrew Alford
- * @date 03/03/2019
+ * @author  Andrew Alford
+ * @date    03/03/2019
  * @version 1.4 - 27/03/2019
  */
 public class ArithmeticLogicUnit : MonoBehaviour {
@@ -54,21 +52,21 @@ public class ArithmeticLogicUnit : MonoBehaviour {
     public void Start() {
         //Delagate input validation on ALU input fields.
         input_x.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input_y.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input_z.onValidateInput += delegate (string input, int charIndex, char addedChar)
-        { return InputValidation.validateAsHex(addedChar); };
+        { return InputValidation.ValidateAsHex(addedChar); };
         input_x.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input_x);
+            InputValidation.FillBlanks_Register(input_x);
             WriteX(input_x.text);
         });
         input_y.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input_y);
+            InputValidation.FillBlanks_Register(input_y);
             WriteY(input_y.text);
         });
         input_z.onEndEdit.AddListener(delegate {
-            InputValidation.fillBlanks_Register(input_z);
+            InputValidation.FillBlanks_Register(input_z);
         });
 
         //Wipe the slate clean after fields have been altered.
@@ -160,8 +158,12 @@ public class ArithmeticLogicUnit : MonoBehaviour {
         Debug.Log("COMPUTING Z: - \n" + z.ToString());
 
         input_z.text = z.GetHex();
+    }
 
-        //Update the PSR with the value of Z.
+    /**
+     * @brief Upates the PSR with the value of ALU z.
+     */
+    public void SetPSR() {
         z.SetPSR(PSR);
     }
 

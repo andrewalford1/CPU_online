@@ -10,36 +10,37 @@ using UnityEngine.Networking;
  * @extends MonoBehaviour
  * @author  Andrew Alford
  * @date    20/03/2019
- * @version 1.2 - 27/03/2019
+ * @version 1.5 - 29/03/2019
  */
 public class ControlUnit : MonoBehaviour
 {
     //CU
-    [SerializeField] private InputField             currentCommandDisplay   = null;
+    [SerializeField] private InputField                 currentCommandDisplay   = null;
     //REGISTERS
-    [SerializeField] private ProgramCounter         PC                      = null;
-    [SerializeField] private MemoryAddressRegister  MAR                     = null;
-    [SerializeField] private MemoryDataRegister     MDR                     = null;
-    [SerializeField] private InstructionRegister    IR                      = null;
-    [SerializeField] private GeneralPurposeRegister GP_A                    = null;
-    [SerializeField] private GeneralPurposeRegister GP_B                    = null;
+    [SerializeField] private ProgramCounter             PC                      = null;
+    [SerializeField] private MemoryAddressRegister      MAR                     = null;
+    [SerializeField] private MemoryDataRegister         MDR                     = null;
+    [SerializeField] private InstructionRegister        IR                      = null;
+    [SerializeField] private GeneralPurposeRegisterA    GPA                     = null;
+    [SerializeField] private GeneralPurposeRegisterB    GPB                     = null;
     //MEMORY
-    [SerializeField] private MemoryListControl      memory                  = null;
+    [SerializeField] private MemoryListControl          memory                  = null;
     //ALU
-    [SerializeField] private ArithmeticLogicUnit    ALU                     = null;
+    [SerializeField] private ArithmeticLogicUnit        ALU                     = null;
     //CLOCK
-    [SerializeField] private Clock                  clock                   = null;
+    [SerializeField] private Clock                      clock                   = null;
     //BUSES
-    [SerializeField] private BusControl             buses                   = null;
+    [SerializeField] private BusControl                 busSystem               = null;
     //BUTTONS
-    [SerializeField] private Button                 fetch_btn               = null;
-    [SerializeField] private Button                 decode_btn              = null;
-    [SerializeField] private Button                 execute_btn             = null;
-    [SerializeField] private Button                 reset_btn               = null;
+    [SerializeField] private Button                     fetch_btn               = null;
+    [SerializeField] private Button                     decode_btn              = null;
+    [SerializeField] private Button                     execute_btn             = null;
+    [SerializeField] private Button                     reset_btn               = null;    
 
     //[instructions] Holds all the instructions that the CU can perform.
     private List<Instruction> instructions = new List<Instruction>();
     private Instruction currentInstruction = null;
+    private MicroInstructions microInstructions = null;
 
     //[currentlyProecssing] 'True' whilst the CU is in use. 
     //(Prevents multiple operations occurring at once.
@@ -71,11 +72,18 @@ public class ControlUnit : MonoBehaviour
             instructions.Add(instruction);
         }
 
+        //Link in the micro instructions.
+        microInstructions = gameObject.GetComponent<MicroInstructions>();
+        microInstructions.LinkCPUcomponents(
+            PC, MAR, MDR, IR, GPA, GPB,
+            memory, ALU, clock, busSystem
+        );
+
         //Delagate listeners to buttons.
-        fetch_btn.onClick.AddListener(  delegate {  Fetch();     });
-        decode_btn.onClick.AddListener( delegate {  Decode();    });
-        execute_btn.onClick.AddListener(delegate {  Execute();   });
-        reset_btn.onClick.AddListener(  delegate {  Reset();     });
+        fetch_btn.onClick.AddListener(  delegate {  StartCoroutine(FetchCycle());     });
+        decode_btn.onClick.AddListener( delegate {  StartCoroutine(DecodeCycle());    });
+        execute_btn.onClick.AddListener(delegate {  StartCoroutine(ExecuteCycle());   });
+        reset_btn.onClick.AddListener(  delegate {  Reset();                          });
 
         //Set up the first instruction in the CU.
         SetCurrentInstructionFromCU(0);
@@ -93,8 +101,8 @@ public class ControlUnit : MonoBehaviour
         MAR.SetActive(!currentlyProcessing);
         MDR.SetActive(!currentlyProcessing);
         IR.SetActive(!currentlyProcessing);
-        GP_A.SetActive(!currentlyProcessing);
-        GP_B.SetActive(!currentlyProcessing);
+        GPA.SetActive(!currentlyProcessing);
+        GPB.SetActive(!currentlyProcessing);
         ALU.SetActive(!currentlyProcessing);
         if (memory.IsActive() && currentlyProcessing) {
             memory.SetActive(false);
@@ -103,113 +111,65 @@ public class ControlUnit : MonoBehaviour
         }
     }
 
+    /**
+     * @returns 'true' if the CU is currently processing.
+     */
     public bool IsCurrentlyProcessing() {
         return currentlyProcessing;
     }
 
     /**
-     * @brief A coroutine to perform a CPU fetch 
-     *        at the desired clockspeed.
+     * @brief A coroutine to perform the 'fetch' cycle.
      */
-    IEnumerator FetchCoroutine() {
-        currentlyProcessing = true;
-
-        //Send the address stored in PC to the MAR for fetching.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.PC_MAR);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        MAR.Write(PC.ReadString());
-        buses.StopTransferringData(BusControl.BUS_ROUTE.PC_MAR);
-
-        //Increment the PC.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.PC_PC);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        PC.Increment();
-        buses.StopTransferringData(BusControl.BUS_ROUTE.PC_PC);
-        
-        //Set the memory pointer to the value of MAR.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.MAR_MEMORY);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        memory.SetPointer(MAR.ReadUnsigned());
-        buses.StopTransferringData(BusControl.BUS_ROUTE.MAR_MEMORY);
-
-        //Write the contents of the memory address being pointed to into MDR.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.MDR_MEMORY);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        MDR.Write(memory.ReadFromMemorySlot());
-        buses.StopTransferringData(BusControl.BUS_ROUTE.MDR_MEMORY);
-
-        currentlyProcessing = false;
-    }
-
-    /**
-     * @brief Performs a CPU fetch.
-     */
-    public void Fetch()
-    {
+    public IEnumerator FetchCycle() {
         if(currentlyProcessing) {
             Debug.Log("Cannot perform fetch as CPU is currently processing.");
         } else {
-            StartCoroutine(FetchCoroutine());
+            currentlyProcessing = true;
+            yield return microInstructions.WriteToMar(PC);
+            yield return microInstructions.WriteToPC(PC);
+           // yield return microInstructions.PCIncrement();
+            yield return microInstructions.MemoryRead();
+            currentlyProcessing = false;
         }
     }
 
     /**
-     * @brief A coroutine to perform a CPU decode 
-     *        at the desired clockspeed.
+     * @brief A coroutine to perform the 'decode' cycle.
      */
-    IEnumerator DecodeCoroutine()
-    {
-        currentlyProcessing = true;
-
-        //Copy the contents of the MDR into the IR for decoding.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.MDR_IR);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        IR.Write(MDR.ReadString());
-        buses.StopTransferringData(BusControl.BUS_ROUTE.MDR_IR);
-
-        //Decode IR's opcode.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.IR_CU);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        SetCurrentInstructionFromCU(IR.Opcode());
-        buses.StopTransferringData(BusControl.BUS_ROUTE.IR_CU);
-
-        currentlyProcessing = false;
-    }
-
-    public void Decode()
+    public IEnumerator DecodeCycle()
     {
         if(currentlyProcessing) {
             Debug.Log("Cannot perform decode as CPU is currently processing");
         } else {
-            StartCoroutine(DecodeCoroutine());
+            currentlyProcessing = true;
+
+            yield return microInstructions.WriteToIR(MDR);
+
+            //Decode IR's opcode.
+            busSystem.StartTransferringData(BusControl.BUS_ROUTE.IR_CU);
+            yield return new WaitForSeconds(clock.GetSpeed());
+            SetCurrentInstructionFromCU(IR.Opcode());
+            busSystem.StopTransferringData(BusControl.BUS_ROUTE.IR_CU);
+
+            currentlyProcessing = false;
         }
     }
 
     /**
      * @brief Executes the current instruction on the CU.
      */
-    public void Execute()
+    public IEnumerator ExecuteCycle()
     {
         if(currentlyProcessing) {
             Debug.Log("Cannot perform execute as CPU is currently processing");
         } else {
+            currentlyProcessing = true;
             if (currentInstruction != null) {
                 //Execute the current instruction.
-                switch(currentInstruction.ID) {
-                    case (0):
-                        StartCoroutine(Instruction_ADD(GP_A));
-                        break;
-                    case (1):
-                        StartCoroutine(Instruction_ADD(GP_B));
-                        break;
-                    case (2):
-                        StartCoroutine(InstructionCoroutine_ADD(GP_A, GP_B));
-                        break;
-                    case (3):
-                        StartCoroutine(InstructionCoroutine_ADD(GP_B, GP_A));
-                        break;
-                }
+                yield return microInstructions.ExecuteInstrucion(currentInstruction.ID);
             }
+            currentlyProcessing = false;
         }
     }
 
@@ -231,8 +191,8 @@ public class ControlUnit : MonoBehaviour
             MAR.Reset();
             MDR.Reset();
             IR.Reset();
-            GP_A.Reset();
-            GP_B.Reset();
+            GPA.Reset();
+            GPB.Reset();
             //Reset the ALU
             ALU.Reset();
             //Reset the clock
@@ -276,83 +236,5 @@ public class ControlUnit : MonoBehaviour
                 currentCommandDisplay.text = currentInstruction.command.Substring(1);
             }
         }
-    }
-
-    /**
-     * @brief A coroutine to perform a ADD instruction 
-     *        at the desired clockspeed.
-     * @param x - The register to be added to.
-     */
-    IEnumerator Instruction_ADD(Register x) {
-
-        currentlyProcessing = true;
-
-        //Copy the contents of register 'x' into ALUx.
-        buses.StartTransferringData(x.RouteToALUx);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        ALU.WriteX(x.ReadString());
-        buses.StopTransferringData(x.RouteToALUx);
-
-        //Copy the Instruction Registers operand into ALUy.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        ALU.WriteY(IR.OperandString());
-        buses.StopTransferringData(BusControl.BUS_ROUTE.IR_ALUY);
-
-        //Set the ALU's circuity.
-        ALU.SetAdditionCircuitry();
-
-        //Compute ALUz.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        ALU.ComputeZ();
-        buses.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
-
-        //Store the result into register x.
-        buses.StartTransferringData(x.RouteToALUz);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        x.Write(ALU.ReadZ());
-        buses.StopTransferringData(x.RouteToALUz);
-
-        currentlyProcessing = false;
-    }
-
-    /**
-     * @brief A coroutine to perform a ADD instruction 
-     *        at the desired clockspeed.
-     * @param x - The register to be added to.
-     * @param y - The other register to be used.
-     */
-    IEnumerator InstructionCoroutine_ADD(Register x, Register y) {
-        currentlyProcessing = true;
-
-        //Copy the contents of register 'x' into ALUx.
-        buses.StartTransferringData(x.RouteToALUx);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        ALU.WriteX(x.ReadString());
-        buses.StopTransferringData(x.RouteToALUx);
-
-        //Copy the contents of register 'y' into ALUy.
-        buses.StartTransferringData(y.RouteToALUy);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        ALU.WriteY(y.ReadString());
-        buses.StopTransferringData(y.RouteToALUy);
-
-        //Set the ALU's circuity.
-        ALU.SetAdditionCircuitry();
-
-        //Compute ALUz.
-        buses.StartTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        ALU.ComputeZ();
-        buses.StopTransferringData(BusControl.BUS_ROUTE.ALUZ_PSR);
-
-        //Store the result into register x.
-        buses.StartTransferringData(x.RouteToALUz);
-        yield return new WaitForSeconds(clock.GetSpeed());
-        x.Write(ALU.ReadZ());
-        buses.StopTransferringData(x.RouteToALUz);
-
-        currentlyProcessing = false;
     }
 }

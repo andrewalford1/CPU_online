@@ -3,14 +3,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /**
- * @brief Class to control all the memory locations.
+ * @brief   Class to control all the memory locations.
  * @extends MonoBehaviour
- * @author Andrew Alford
- * @date 26/02/2019
+ * @author  Andrew Alford
+ * @date    26/02/2019
  * @version 1.2 - 27/03/2019
  */
-public class MemoryListControl : MonoBehaviour
-{
+public class MemoryListControl : MonoBehaviour {
     [SerializeField]
     GameObject inputFieldTemplate = null;
 
@@ -33,11 +32,9 @@ public class MemoryListControl : MonoBehaviour
     /**
      * @brief Initialisation code of the memory controls.
      */
-    private void Start()
-    {
+    private void Start() {
         //Create memory locations
-        for (int i = 0; i < NUM_MEMORY_LOCATIONS; i++)
-        {
+        for (int i = 0; i < NUM_MEMORY_LOCATIONS; i++) {
             Number ID = new Number((short)i);
 
             //Add a new memory location.
@@ -60,20 +57,19 @@ public class MemoryListControl : MonoBehaviour
             //Added input validation.
             memoryLocationsUI[i].GetComponentsInChildren<InputField>()[0].onValidateInput += 
                 delegate (string input, int charIndex, char addedChar) 
-                { return InputValidation.validateAsHex(addedChar); };
+                { return InputValidation.ValidateAsHex(addedChar); };
         }
 
         //[loactionIndex] Used to point to a specific place in memory.
         int locationIndex = 0;
         //For every memory slot...
-        foreach (MemorySlot slot in slots)
-        {
+        foreach (MemorySlot slot in slots) {
             //Callback functions for input UI.
             //Fill in the blanks.
             memoryLocationsUI[locationIndex].GetComponentsInChildren<InputField>()[0].onEndEdit.AddListener(
                 delegate
                 {
-                    InputValidation.fillBlanks_Register(
+                    InputValidation.FillBlanks_Register(
              memoryLocationsUI[slot.GetID()].GetComponentsInChildren<InputField>()[0]);
                 }
             );
@@ -89,8 +85,7 @@ public class MemoryListControl : MonoBehaviour
      *        Writes the new value to the memory slot.
      * @param memorySlotID - The ID of the memory slot that has been changed.
      */
-    private void OnValueChanged(int memorySlotID)
-    {
+    private void OnValueChanged(int memorySlotID) {
         Debug.Log("Memory Location " + memorySlotID + " has been changed.");
         slots[memorySlotID].Write(
             memoryLocationsUI[memorySlotID].GetComponentsInChildren<InputField>()[0].text
@@ -101,8 +96,7 @@ public class MemoryListControl : MonoBehaviour
     /**
      * @brief Clears the all memory slots to their starting values.
      */
-    public void EmptyMemory()
-    {
+    public void EmptyMemory() {
         //[loactionIndex] Used to point to a specific place in memory.
         int locationIndex = 0;
         //For every memory slot...
@@ -122,8 +116,7 @@ public class MemoryListControl : MonoBehaviour
      * @parameter ID - The ID in integer form
      * @return A padded string of the ID. (E.g. 7 would return "007").
      */
-    private string GetID(int id)
-    {
+    private string GetID(int id) {
         //[stringID] contains the ID in string format.
         string stringID = id.ToString();
 
@@ -146,8 +139,7 @@ public class MemoryListControl : MonoBehaviour
      * @brief Allows you to set the memory location being focused on.
      * @param ID - The ID of the memory location to be focused on.
      */
-    public void SetPointer(int ID)
-    {
+    public void SetPointer(int ID) {
         //Check the given ID is in range.
         if (ID > (slots.Count - 1) || ID < 0)
         {
@@ -157,6 +149,7 @@ public class MemoryListControl : MonoBehaviour
         {
             //Allocate the new pointer ID.
             pointer = ID;
+            memoryLocationsUI[ID].GetComponent<Image>().enabled = true;
             Debug.Log("slot pointer set to: " + pointer);
         }
     }
@@ -165,11 +158,11 @@ public class MemoryListControl : MonoBehaviour
      * @brief Writes a hex string to the memory slot being pointed at.
      * @param value - The value to be written to the memory slot.
      */
-    public void WriteToMemorySlot(string value)
-    {
+    public void WriteToMemorySlot(string value) {
         slots[pointer].Write(value);
         memoryLocationsUI[pointer].GetComponentsInChildren<InputField>()[0].text 
             = InputValidation.FillBlanks(value, 4);
+        memoryLocationsUI[pointer].GetComponent<Image>().enabled = false;
     }
 
     /**
@@ -178,8 +171,8 @@ public class MemoryListControl : MonoBehaviour
      * @return Returns the content of the memory slot 
      *         currently in focus.
      */
-    public string ReadFromMemorySlot()
-    {
+    public string ReadFromMemorySlot() {
+        memoryLocationsUI[pointer].GetComponent<Image>().enabled = false;
         return slots[pointer].Read();
     }
 

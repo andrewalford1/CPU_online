@@ -1,8 +1,8 @@
 ﻿/**
- * @brief Class representing the IR.
+ * @brief   Class representing the IR.
  * @extends Register
- * @author Andrew Alford
- * @date 28/02/2019
+ * @author  Andrew Alford
+ * @date    28/02/2019
  * @version 1.1 - 29/03/2019
  */
 public class InstructionRegister : Register {

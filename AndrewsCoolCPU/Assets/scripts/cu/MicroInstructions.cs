@@ -376,7 +376,7 @@ public class MicroInstructions : MonoBehaviour
                 yield return WriteToGPA(GPB);
                 break;
             case (0x17):
-                yield return WriteToGPB(GPB);
+                yield return WriteToGPB(GPA);
                 break;
             case (0x18):
                 yield return Instruction_moveToMemory_DIRECT(GPA);

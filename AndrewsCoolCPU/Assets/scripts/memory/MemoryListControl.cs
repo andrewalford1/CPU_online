@@ -149,6 +149,7 @@ public class MemoryListControl : MonoBehaviour {
         {
             //Allocate the new pointer ID.
             pointer = ID;
+            memoryLocationsUI[ID].GetComponent<Image>().enabled = true;
             Debug.Log("slot pointer set to: " + pointer);
         }
     }
@@ -161,6 +162,7 @@ public class MemoryListControl : MonoBehaviour {
         slots[pointer].Write(value);
         memoryLocationsUI[pointer].GetComponentsInChildren<InputField>()[0].text 
             = InputValidation.FillBlanks(value, 4);
+        memoryLocationsUI[pointer].GetComponent<Image>().enabled = false;
     }
 
     /**
@@ -169,7 +171,10 @@ public class MemoryListControl : MonoBehaviour {
      * @return Returns the content of the memory slot 
      *         currently in focus.
      */
-    public string ReadFromMemorySlot() => slots[pointer].Read();
+    public string ReadFromMemorySlot() {
+        memoryLocationsUI[pointer].GetComponent<Image>().enabled = false;
+        return slots[pointer].Read();
+    }
 
     /**
      * @brief Toggles interaction with the component's UI.

@@ -142,6 +142,10 @@ public class ConsoleControl : MonoBehaviour {
                 LogCommand(text);
                 CU.Reset();
                 return true;
+            case ("\\RUN"):
+                LogCommand(text);
+                StartCoroutine(CU.RunCycle());
+                return true;
         }
         return false;
     }

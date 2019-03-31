@@ -7,7 +7,7 @@ using UnityEngine.UI;
  * @extends MonoBehaviour
  * @author  Andrew Alford
  * @date    26/02/2019
- * @version 1.2 - 27/03/2019
+ * @version 1.3 - 31/03/2019
  */
 public class MemoryListControl : MonoBehaviour {
     [SerializeField]
@@ -77,6 +77,17 @@ public class MemoryListControl : MonoBehaviour {
             memoryLocationsUI[locationIndex].GetComponentsInChildren<InputField>()[0].onEndEdit.AddListener(
                 delegate { OnValueChanged(slot.GetID()); });
             locationIndex++;
+        }
+    }
+
+    /**
+     * @brief Loads a program onto memory.
+     * @param program - The program to be loaded.
+     */
+    public void LoadProgram(Program program) {
+        for(int i = 0; i < program.data.Length; i++) {
+            SetPointer(i);
+            WriteToMemorySlot(program.data[i]);
         }
     }
 

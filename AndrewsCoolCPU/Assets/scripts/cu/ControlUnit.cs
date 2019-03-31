@@ -31,27 +31,44 @@ public class ControlUnit : MonoBehaviour
     [SerializeField] private Clock                      clock                   = null;
     //BUSES
     [SerializeField] private BusControl                 busSystem               = null;
-    //BUTTONS
-    [SerializeField] private Button                     fetch_btn               = null;
-    [SerializeField] private Button                     decode_btn              = null;
-    [SerializeField] private Button                     execute_btn             = null;
-    [SerializeField] private Button                     reset_btn               = null;    
 
-    //[instructions] Holds all the instructions that the CU can perform.
-    private List<Instruction> instructions = new List<Instruction>();
+    //[instructionSet] Holds all the instructions that the CU can perform.
+    private List<Instruction> instructionSet = new List<Instruction>();
     private Instruction currentInstruction = null;
     private MicroInstructions microInstructions = null;
 
     //[currentlyProecssing] 'True' whilst the CU is in use. 
     //(Prevents multiple operations occurring at once.
     private bool currentlyProcessing = false;
+    //[loading] 'True' whilst the CU is initialising.
+    private bool loading = true;
 
     /**
      * @brief Inialise the Control Unit.
      */
     IEnumerator Start()
     {
-        string url = Application.streamingAssetsPath + "/instruction_set.json";
+        //Wait until the insturction set it loaded.
+        yield return LoadInstructionSet();
+
+        //Link in the micro instructions.
+        microInstructions = gameObject.GetComponent<MicroInstructions>();
+        microInstructions.LinkCPUcomponents(
+            PC, MAR, MDR, IR, GPA, GPB,
+            memory, ALU, clock, busSystem
+        );
+
+        //Set up the first instruction in the CU.
+        SetCurrentInstructionFromCU(0);
+
+        loading = false;
+    }
+
+    /**
+     * @brief Loads the CU's instruction set.
+     */
+    private IEnumerator LoadInstructionSet() {
+        string url = Application.streamingAssetsPath + "/json/instruction_set.json";
         string json;
 
         //Check if we should use UnityWebRequest or File.ReadAllBytes
@@ -69,34 +86,14 @@ public class ControlUnit : MonoBehaviour
         foreach (Instruction instruction in JsonUtility
             .FromJson<InstructionSet>(json).instructions)
         {
-            instructions.Add(instruction);
+            instructionSet.Add(instruction);
         }
-
-        //Link in the micro instructions.
-        microInstructions = gameObject.GetComponent<MicroInstructions>();
-        microInstructions.LinkCPUcomponents(
-            PC, MAR, MDR, IR, GPA, GPB,
-            memory, ALU, clock, busSystem
-        );
-
-        //Delagate listeners to buttons.
-        fetch_btn.onClick.AddListener(  delegate {  StartCoroutine(FetchCycle());     });
-        decode_btn.onClick.AddListener( delegate {  StartCoroutine(DecodeCycle());    });
-        execute_btn.onClick.AddListener(delegate {  StartCoroutine(ExecuteCycle());   });
-        reset_btn.onClick.AddListener(  delegate {  Reset();                          });
-
-        //Set up the first instruction in the CU.
-        SetCurrentInstructionFromCU(0);
     }
 
     /**
      * @brief Updates the CU once every frame.
      */
     private void Update() {
-        fetch_btn.interactable = !currentlyProcessing;
-        decode_btn.interactable = !currentlyProcessing;
-        execute_btn.interactable = !currentlyProcessing;
-        reset_btn.interactable = !currentlyProcessing;
         PC.SetActive(!currentlyProcessing);
         MAR.SetActive(!currentlyProcessing);
         MDR.SetActive(!currentlyProcessing);
@@ -119,6 +116,26 @@ public class ControlUnit : MonoBehaviour
     }
 
     /**
+     * @returns 'ture' if the CU is currently loading.
+     */
+    public bool IsLoading() {
+        return loading;
+    }
+
+    public IEnumerator RunCycle() {
+        if(currentlyProcessing) {
+            Debug.Log("Cannot run program as CPU is currently processing.");
+        } else {
+            while(currentInstruction.ID != 0x1C) {
+                yield return FetchCycle();
+                yield return DecodeCycle();
+                yield return ExecuteCycle();
+            }
+            
+        }
+    }
+
+    /**
      * @brief A coroutine to perform the 'fetch' cycle.
      */
     public IEnumerator FetchCycle() {
@@ -128,7 +145,6 @@ public class ControlUnit : MonoBehaviour
             currentlyProcessing = true;
             yield return microInstructions.WriteToMar(PC);
             yield return microInstructions.WriteToPC(PC);
-           // yield return microInstructions.PCIncrement();
             yield return microInstructions.MemoryRead();
             currentlyProcessing = false;
         }
@@ -207,7 +223,7 @@ public class ControlUnit : MonoBehaviour
 
     public Instruction GetInstruction(string command)
     {
-        foreach(Instruction instruction in instructions)
+        foreach(Instruction instruction in instructionSet)
         {
             if(instruction.command.Equals(command))
             {
@@ -219,9 +235,13 @@ public class ControlUnit : MonoBehaviour
 
     private void SetCurrentInstructionFromCU(int id) {
         //Only change the current instruction if the ID is in bounds.
-        if (id >= 0 && id < instructions.Count) {
-            currentInstruction = instructions[id];
+        if (id >= 0 && id < instructionSet.Count)
+        {
+            currentInstruction = instructionSet[id];
             currentCommandDisplay.text = currentInstruction.command.Substring(1);
+        }
+        else {
+            ConsoleControl.CONSOLE.LogError("Invalid instruction given");
         }
     }
 
@@ -231,9 +251,12 @@ public class ControlUnit : MonoBehaviour
             Debug.Log("Cannot set instruction as CPU is currently processing");
         } else {
             //Only change the current instruction if the ID is in bounds.
-            if (id >= 0 && id < instructions.Count) {
-                currentInstruction = instructions[id];
+            if (id >= 0 && id < instructionSet.Count) {
+                currentInstruction = instructionSet[id];
                 currentCommandDisplay.text = currentInstruction.command.Substring(1);
+            }
+            else {
+                ConsoleControl.CONSOLE.LogError("Invalid instruction given");
             }
         }
     }

@@ -167,6 +167,12 @@
       "ID_HEX": "001B",
       "command": "\\MOVE B,(addr)",
       "description": "Store reg. B at a mem. indirect addr"
+    },
+    {
+      "ID": 28,
+      "ID_HEX": "001C",
+      "command": "\\HALT",
+      "description": "Halt processor"
     }
   ]
 }

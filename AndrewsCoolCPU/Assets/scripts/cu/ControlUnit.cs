@@ -126,7 +126,7 @@ public class ControlUnit : MonoBehaviour
         if(currentlyProcessing) {
             Debug.Log("Cannot run program as CPU is currently processing.");
         } else {
-            while(currentInstruction.ID != 0x1C) {
+            while(currentInstruction.ID != 0xFF) {
                 yield return FetchCycle();
                 yield return DecodeCycle();
                 yield return ExecuteCycle();
@@ -233,31 +233,37 @@ public class ControlUnit : MonoBehaviour
         return null;
     }
 
+    /**
+     * @brief Assigns an instruction to be executed to the CU.
+     * @param id - The id of the instruction being set.
+     */
     private void SetCurrentInstructionFromCU(int id) {
-        //Only change the current instruction if the ID is in bounds.
-        if (id >= 0 && id < instructionSet.Count)
-        {
-            currentInstruction = instructionSet[id];
-            currentCommandDisplay.text = currentInstruction.command.Substring(1);
+        bool validID = false;
+
+        //Check if the id is valid.
+        for(int i = 0; i < instructionSet.Count; i++) {
+            if (id == instructionSet[i].ID) {
+                currentInstruction = instructionSet[i];
+                currentCommandDisplay.text = currentInstruction.command.Substring(1);
+                validID = true;
+            }
+
         }
-        else {
+        if (!validID) {
             ConsoleControl.CONSOLE.LogError("Invalid instruction given");
         }
     }
 
+    /**
+     * @brief Assigns an instruction to be executed to the CU.
+     * @param id - The id of the instruction being set.
+     */
     public void SetCurrentInstructionFromConsole(int id)
     {
         if (currentlyProcessing) {
             Debug.Log("Cannot set instruction as CPU is currently processing");
         } else {
-            //Only change the current instruction if the ID is in bounds.
-            if (id >= 0 && id < instructionSet.Count) {
-                currentInstruction = instructionSet[id];
-                currentCommandDisplay.text = currentInstruction.command.Substring(1);
-            }
-            else {
-                ConsoleControl.CONSOLE.LogError("Invalid instruction given");
-            }
+            SetCurrentInstructionFromCU(id);
         }
     }
 }

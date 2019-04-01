@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 public class TextEditorControl : MonoBehaviour
 {
     //[memory] A reference to the memory programs are loaded onto.
-    [SerializeField] MemoryListControl memory;
+    [SerializeField] MemoryListControl memory = null;
 
     //[program] The program currently loaded into the text editor.
     private Program program = null;
@@ -43,6 +43,9 @@ public class TextEditorControl : MonoBehaviour
         if(program.Equals(null)) {
             ConsoleControl.CONSOLE.LogError("You must first load a program");
             return;
+        }
+        else if(!program.assembled) {
+            ConsoleControl.CONSOLE.LogError("Cannot load a program which hasn't been assembled");
         }
         else if(program.errors.Length > 0)
         {

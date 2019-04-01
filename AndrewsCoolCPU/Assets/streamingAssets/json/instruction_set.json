@@ -169,8 +169,8 @@
       "description": "Store reg. B at a mem. indirect addr"
     },
     {
-      "ID": 28,
-      "ID_HEX": "001C",
+      "ID": 255,
+      "ID_HEX": "00FF",
       "command": "\\HALT",
       "description": "Halt processor"
     }

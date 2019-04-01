@@ -26,6 +26,9 @@ public class ConsoleControl : MonoBehaviour {
     //[CU] A link to the control unit for executing commands.
     [SerializeField] private ControlUnit CU = null;
 
+    //[textEditor] A link to the text editor of compiling and loading programs.
+    [SerializeField] private TextEditorControl textEditor = null;
+
     //[textItems] A list of all the consoles content.
     private List<GameObject> textItems;
 
@@ -125,7 +128,15 @@ public class ConsoleControl : MonoBehaviour {
      *          global command.
      */
     public bool CheckForGlobalCommand(string text) {
-        switch (text) {
+
+        string[] content = text.Split(' ');
+        string command = content[0];
+        string additionalData = null;
+        if(content.Length > 1) {
+            additionalData = content[1];
+        }
+
+        switch (command) {
             case ("\\FETCH"):
                 LogCommand(text);
                 StartCoroutine(CU.FetchCycle());
@@ -145,6 +156,14 @@ public class ConsoleControl : MonoBehaviour {
             case ("\\RUN"):
                 LogCommand(text);
                 StartCoroutine(CU.RunCycle());
+                return true;
+            case ("\\ASSEMBLE"):
+                LogCommand(text);
+                textEditor.Assemble();
+                return true;
+            case ("\\LOAD"):
+                LogCommand(text);
+                textEditor.LoadIntoMemory();
                 return true;
         }
         return false;

@@ -5,7 +5,7 @@
   "description" : "A program written by a user",
   "assembled" : true,
   "code" : [
-    "ORG  0000",
+    "ORG 00",
     "MOVE #^42,A",
     "MOVE A,$000C",
     "HALT"
@@ -22,5 +22,4 @@
     "0005",
     "FF00"
   ]
-  
 }

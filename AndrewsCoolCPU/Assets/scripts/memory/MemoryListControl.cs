@@ -85,7 +85,7 @@ public class MemoryListControl : MonoBehaviour {
      * @param program - The program to be loaded.
      */
     public void LoadProgram(Program program) {
-        for(int i = 0; i < program.data.Length; i++) {
+        for(int i = 0; i < program.data.Count; i++) {
             SetPointer(i);
             WriteToMemorySlot(program.data[i]);
         }

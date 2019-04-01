@@ -1549,6 +1549,11 @@ PrefabInstance:
       propertyPath: CU
       value: 
       objectReference: {fileID: 64984022}
+    - target: {fileID: 4992853157941596745, guid: e15d8c9d4b49af64dbcde74d195d51a2,
+        type: 3}
+      propertyPath: textEditor
+      value: 
+      objectReference: {fileID: 1570639932}
     - target: {fileID: 4992853156121590532, guid: e15d8c9d4b49af64dbcde74d195d51a2,
         type: 3}
       propertyPath: m_AnchoredPosition.y

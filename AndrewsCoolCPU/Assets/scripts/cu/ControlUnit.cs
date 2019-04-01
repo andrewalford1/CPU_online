@@ -38,7 +38,7 @@ public class ControlUnit : MonoBehaviour
     private MicroInstructions microInstructions = null;
 
     //[currentlyProecssing] 'True' whilst the CU is in use. 
-    //(Prevents multiple operations occurring at once.
+    //(Prevents multiple operations occurring at once).
     private bool currentlyProcessing = false;
     //[loading] 'True' whilst the CU is initialising.
     private bool loading = true;

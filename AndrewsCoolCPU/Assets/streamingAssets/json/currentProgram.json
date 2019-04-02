@@ -5,8 +5,8 @@
   "description" : "A program written by a user",
   "assembled" : true,
   "code" : [
-    "ORG 00",
-    "MOVE #^42,A",
+    "ORG $00",
+    "SUB B,A",
     "MOVE A,$000C",
     "HALT"
   ],

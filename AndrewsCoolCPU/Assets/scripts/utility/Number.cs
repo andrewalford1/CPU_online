@@ -5,7 +5,7 @@ using UnityEngine;
  * @brief   Defines a Number to be used in the simulator.
  * @author  Andrew Alford
  * @date    14/03/2019
- * @version 2.2 - 30/03/2019
+ * @version 2.3 - 02/04/2019
  */
 public class Number {
     //[DEFUALT] The defualt value of the Number.

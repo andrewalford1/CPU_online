@@ -7,11 +7,16 @@ using System.Text.RegularExpressions;
  * @extends MonoBehaviour
  * @author  Andrew Alford
  * @date    19/02/2019
- * @version 2.0 - 27/02/2019
+ * @version 2.1 - 02/04/2019
  */
 public class InputValidation : MonoBehaviour {
-    //A regular expression for hexadecimal characters.
+
+    //[hexCharacters] A regular expression for hexadecimal characters.
     static private Regex hexCharacters = new Regex("([A-F]|[0-9])");
+    //[hexString] A regular expression to validate hex strings.
+    static private Regex hexString = new Regex("\\$([\\da-fA-F]{1,4})");
+    //[decimalString] A regualar expression to validate decimal strings.
+    static private Regex decimalString = new Regex("\\^(\\d)");
 
     /**
      * @brief Checks if a given char is a hexadeciamal value.
@@ -74,5 +79,35 @@ public class InputValidation : MonoBehaviour {
             content = blankSpaces += content;
         }
         return content;
+    }
+
+    /**
+     * @brief Validates a given string as hexidecimal.
+     * @param content - The string to be validated.
+     */
+    static public bool IsHex(string content) {
+        return hexString.IsMatch(content);
+    }
+
+    /**
+     * @brief Validates a given string as decimal.
+     * @param content - The string to be validated.
+     */
+    static public bool IsDecimal(string content) {
+        return decimalString.IsMatch(content);
+    }
+
+    /**
+     * @brief Converts a decimal string to a hexidecimal string.
+     * @param decimalContent - The value to be converted.
+     * @returns the hexidecimal equivelent to the decimal value given.
+     */
+    static public string DecimalToHex(string decimalContent) {
+
+        Debug.Log("decimal extraction: " + decimalContent);
+        //Convert the string to a number.
+        Number number = new Number(int.Parse(decimalContent));
+
+        return number.GetHex();
     }
 }

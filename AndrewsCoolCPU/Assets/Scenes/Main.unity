@@ -3324,6 +3324,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: '----Memory----'
       objectReference: {fileID: 0}
+    - target: {fileID: 9057764699479494280, guid: 77d25625628d5c94db66558f4e3bedc3,
+        type: 3}
+      propertyPath: PC
+      value: 
+      objectReference: {fileID: 7642528}
     - target: {fileID: 9057764699479494281, guid: 77d25625628d5c94db66558f4e3bedc3,
         type: 3}
       propertyPath: m_LocalPosition.x

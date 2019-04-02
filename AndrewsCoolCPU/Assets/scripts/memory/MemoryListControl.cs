@@ -10,8 +10,10 @@ using UnityEngine.UI;
  * @version 1.3 - 31/03/2019
  */
 public class MemoryListControl : MonoBehaviour {
-    [SerializeField]
-    GameObject inputFieldTemplate = null;
+    [SerializeField] private GameObject inputFieldTemplate = null;
+
+    //[PC] A reference to the PC so the inital address can be set.
+    [SerializeField] ProgramCounter PC = null;
 
     //[NUM_MEMORY_LOCATIONS] Stores the total number of memory locations.
     public const int NUM_MEMORY_LOCATIONS = 256;
@@ -81,14 +83,35 @@ public class MemoryListControl : MonoBehaviour {
     }
 
     /**
-     * @brief Loads a program onto memory.
+     * @brief Loads a program onto memory (if there is room for it).
      * @param program - The program to be loaded.
+     * @returns 'true' if the program sucessfully loaded.
      */
-    public void LoadProgram(Program program) {
-        for(int i = 0; i < program.data.Count; i++) {
-            SetPointer(i);
-            WriteToMemorySlot(program.data[i]);
+    public bool LoadProgram(Program program) {
+        Number startPoint = new Number();
+        startPoint.SetNumber(program.data[0]);
+        int startIndex = startPoint.GetUnsigned();
+        int endIndex = (startPoint.GetUnsigned() + program.data.Count) - 1;
+
+        if (startIndex + program.data.Count > NUM_MEMORY_LOCATIONS) {
+            ConsoleControl.CONSOLE.LogError("Not enough room in memory to load the program");
+            return false;
         }
+        else {
+
+            int dataIndex = 1;
+            for(int i = startIndex; i < endIndex; i++) {
+                SetPointer(i);
+                WriteToMemorySlot(program.data[dataIndex++]);
+            }
+
+            //Point the PC to the first instruction to be fetched.
+            PC.Write(startPoint.GetHex());
+           
+            return true;
+        }
+
+        
     }
 
     /**

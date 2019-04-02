@@ -12,6 +12,8 @@ public class TextEditorControl : MonoBehaviour
     //[program] The program currently loaded into the text editor.
     private Program program = null;
 
+    private Assembler assembler = new Assembler();
+
     //[currentlyProecssing] 'True' whilst the text editor is in use. 
     //(Prevents multiple operations occurring at once).
     private bool currentlyProcessing = false;
@@ -44,20 +46,8 @@ public class TextEditorControl : MonoBehaviour
     }
 
     /**
-     * @brief Helper method to wipe the program prior to its assembly.
-     *        This is to prevent errors during the assembly process.
+     * @brief Attempts to assemble the currently loaded program.
      */
-    private void WipeProgram() {
-        if(program.Equals(null)) {
-            ConsoleControl.CONSOLE.LogError("Cannot wipe a program which doesn't exist.");
-            return;
-        }
-
-        program.assembled = false;
-        program.errors.Clear();
-        program.data.Clear();
-    }
-
     public void Assemble() {
         if(currentlyProcessing) {
             ConsoleControl.CONSOLE.LogError("Cannot assemble program as Text Editor is currently processing.");
@@ -65,25 +55,7 @@ public class TextEditorControl : MonoBehaviour
         }
 
         currentlyProcessing = true;
-
-        //Wipe the program clean prior to assembly.
-        WipeProgram();
-
-        //Break down insturctions into raw data.
-        for(int i = 0; i < program.code.Count; i++) {
-            program.data.Add(GetData(program.code[i], i));
-        }
-
-        //Log any errors if they occurred.
-        if(program.errors.Count == 0) {
-            program.assembled = true;
-            ConsoleControl.CONSOLE.LogMessage("Program compiled with 0 errors.");
-        } else {
-            ConsoleControl.CONSOLE.LogMessage("Program compiled with " + program.errors.Count + " errors:");
-            foreach(string error in program.errors) {
-                ConsoleControl.CONSOLE.LogError(error);
-            }
-        }
+        assembler.AssembleProgram(program);
         currentlyProcessing = false;
     }
 
@@ -119,65 +91,5 @@ public class TextEditorControl : MonoBehaviour
 
         memory.LoadProgram(program);
         currentlyProcessing = false;
-    }
-
-    private string GetData(string insturction, int lineNumber) {
-        string[] instrutionBreakDown = insturction.Split(' ');
-
-        string command = instrutionBreakDown[0];
-        List<string> parameters = new List<string>();
-
-        if (instrutionBreakDown.Length > 1)
-        {
-            for(int i = 1; i < instrutionBreakDown.Length; i++) {
-                parameters.Add(instrutionBreakDown[i]);
-                Debug.Log(instrutionBreakDown[i]);
-            }
-        }
-
-
-        if(parameters.Count > 0) {
-            Debug.Log("Command: " + command + " Parameters: " + parameters.Count);
-        } 
-        else
-        {
-            Debug.Log("Command: " + command + " Parameters: No Parameters");
-        }
-
-        switch(command)
-        {
-            case ("ORG"):
-                return CreateORGCommand(parameters, lineNumber);
-            case ("MOVE"):
-                break;
-            case ("HALT"):
-                return new Number(0xFFFF).GetHex();
-        }
-
-
-        return new Number(0x0001).GetHex();
-    }
-
-    private string CreateORGCommand(List<string> parameters, int lineNumber ) {
-        if(parameters.Count > 1) {
-            ConsoleControl.CONSOLE.LogError("Error: Parameter must be a hex value. (Line: " + lineNumber + ")");
-            program.errors.Add("Error: Too many parameters given. (Line: " + lineNumber + ")");
-        }
-
-        if(parameters[0].Length > 2) {
-            ConsoleControl.CONSOLE.LogError("Error: Parameter must be a hex value. (Line: " + lineNumber + ")");
-            program.errors.Add("Error: Parameter is too big. (Line: " + lineNumber + ")");
-        }
-
-        foreach(char c in parameters[0]) {
-            if(InputValidation.ValidateAsHex(c).Equals('\0')) {
-                ConsoleControl.CONSOLE.LogError("Error: Parameter must be a hex value. (Line: " + lineNumber + ")");
-                program.errors.Add("Error: Parameter must be a hex value. (Line: " + lineNumber + ")");
-            }
-        }
-
-        Number value = new Number();
-        value.SetNumber(parameters[0]);
-        return value.GetHex();
     }
 }

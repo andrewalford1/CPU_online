@@ -103,8 +103,6 @@ public class InputValidation : MonoBehaviour {
      * @returns the hexidecimal equivelent to the decimal value given.
      */
     static public string DecimalToHex(string decimalContent) {
-
-        Debug.Log("decimal extraction: " + decimalContent);
         //Convert the string to a number.
         Number number = new Number(int.Parse(decimalContent));
 

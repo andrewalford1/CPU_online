@@ -161,9 +161,9 @@ public class Assembler
             case ("SUB"):
                 return CreateSUBCommand(parameters, lineNumber);
             case ("CMP"):
-                break;
+                return CreateCMPCommand(parameters, lineNumber);
             case ("MOVE"):
-                break;
+                return CreateMOVECommand(parameters, lineNumber);
             case ("HALT"):
                 return CreateHALTCommand(parameters, lineNumber);
         }
@@ -210,7 +210,7 @@ public class Assembler
                     return InputValidation.DecimalToHex(data.Substring(1));
                 }
                 break;
-            case ('#'): //It's a hex value.
+            case ('$'): //It's a hex value.
                 if (IsHex(data, lineNumber))
                 {
                     return data.Substring(1);
@@ -254,6 +254,8 @@ public class Assembler
         string operand = "00";
         string opcode = "00";
 
+        Debug.Log("parameter 0: " + parameters[0] + "\tparameter 1: " + parameters[1]);
+
         //Immediate add.
         if(parameters[0].ToCharArray()[0].Equals('#')) {
             if(parameters[1].Equals("A")) {
@@ -269,7 +271,7 @@ public class Assembler
             if (opcode.Equals("\0")) { return opcode; }
         }
         //Direct ADD.
-        else if(parameters[0].StartsWith("(") && parameters[0].EndsWith(")")) {
+        else if(parameters[0].StartsWith("$") || parameters[0].StartsWith("^")) {
             if(parameters[1].Equals("A")) {
                 //Direct add to GPA.
                 operand = "02";
@@ -278,8 +280,9 @@ public class Assembler
                 //Direct add to GPB.
                 operand = "03";
             }
+            Debug.Log("direct add");
             //Extract the data (minus the brackets).
-            opcode = ExtractData(parameters[0].Substring(1, parameters[0].Length - 2), lineNumber).Substring(2);
+            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }
@@ -323,33 +326,33 @@ public class Assembler
         {
             if (parameters[1].Equals("A"))
             {
-                //Immediate add to GPA.
+                //Immediate sub to GPA.
                 operand = "06";
             }
             else if (parameters[1].Equals("B"))
             {
-                //Immediate add to GPB.
+                //Immediate sub to GPB.
                 operand = "07";
             }
             opcode = ExtractData(parameters[0].Substring(1), lineNumber).Substring(2);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }
-        //Direct ADD.
-        else if (parameters[0].StartsWith("(") && parameters[0].EndsWith(")"))
+        //Direct SUB.
+        else if (parameters[0].StartsWith("$") || parameters[0].StartsWith("^"))
         {
             if (parameters[1].Equals("A"))
             {
-                //Direct add to GPA.
+                //Direct sub to GPA.
                 operand = "08";
             }
             else if (parameters[1].Equals("B"))
             {
-                //Direct add to GPB.
+                //Direct sub to GPB.
                 operand = "09";
             }
             //Extract the data (minus the brackets).
-            opcode = ExtractData(parameters[0].Substring(1, parameters[0].Length - 2), lineNumber).Substring(2);
+            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }
@@ -362,6 +365,176 @@ public class Assembler
         else if (parameters[0].Equals("B") && parameters[1].Equals("A"))
         {
             operand = "0B";
+        }
+        else
+        {
+            NewError(lineNumber, "Unrecognised command");
+            return "\0";
+        }
+
+        Number command = new Number();
+        command.SetNumber(operand + opcode);
+        return command.GetHex();
+    }
+
+    /**
+      * @brief Makes up an CMP command.
+      * @returns the CMP command (or \0 if any errors occurred).
+      */
+    private string CreateCMPCommand(List<string> parameters, int lineNumber)
+    {
+        //Error check parameters.
+        if (TooManyParameters(parameters, 2, lineNumber)) { return "\0"; }
+        else if (parameters[0].Equals(parameters[1])) {
+            NewError(lineNumber, "Unrecognised command");
+            return "\0";
+        }
+
+        string operand = "00";
+        string opcode = "00";
+
+        //Immediate CMP.
+        if (parameters[0].ToCharArray()[0].Equals('#')) {
+            if (parameters[1].Equals("A")) {
+                //Immediate cmp to GPA.
+                operand = "0C";
+            }
+            else if (parameters[1].Equals("B")) {
+                //Immediate cmp to GPB.
+                operand = "0D";
+            }
+            opcode = ExtractData(parameters[0].Substring(1), lineNumber).Substring(2);
+            //Number is invalid.
+            if (opcode.Equals("\0")) { return opcode; }
+        }
+        //Direct CMP.
+        else if (parameters[0].StartsWith("$") || parameters[0].StartsWith("^")) {
+            if (parameters[1].Equals("A")) {
+                //Direct cmp to GPA.
+                operand = "0E";
+            }
+            else if (parameters[1].Equals("B")) {
+                //Direct cmp to GPB.
+                operand = "0F";
+            }
+            //Extract the data (minus the brackets).
+            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
+            //Number is invalid.
+            if (opcode.Equals("\0")) { return opcode; }
+        }
+        //CMP GPB to GPA
+        else if (parameters[0].Equals("A") && parameters[1].Equals("B")) {
+            operand = "10";
+        }
+        //CMP GPA to GPB
+        else if (parameters[0].Equals("B") && parameters[1].Equals("A")) {
+            operand = "11";
+        }
+        else {
+            NewError(lineNumber, "Unrecognised command");
+            return "\0";
+        }
+
+        Number command = new Number();
+        command.SetNumber(operand + opcode);
+        return command.GetHex();
+    }
+
+    /**
+      * @brief Makes up an CMP command.
+      * @returns the CMP command (or \0 if any errors occurred).
+      */
+    private string CreateMOVECommand(List<string> parameters, int lineNumber)
+    {
+        //Error check parameters.
+        if (TooManyParameters(parameters, 2, lineNumber)) { return "\0"; }
+        else if (parameters[0].Equals(parameters[1]))
+        {
+            NewError(lineNumber, "Unrecognised command");
+            return "\0";
+        }
+
+        string operand = "00";
+        string opcode = "00";
+
+        //Immediate MOVE.
+        if (parameters[0].ToCharArray()[0].Equals('#'))
+        {
+            if (parameters[1].Equals("A"))
+            {
+                //Immediate move to GPA.
+                operand = "12";
+            }
+            else if (parameters[1].Equals("B"))
+            {
+                //Immediate move to GPB.
+                operand = "13";
+            }
+            opcode = ExtractData(parameters[0].Substring(1), lineNumber).Substring(2);
+            //Number is invalid.
+            if (opcode.Equals("\0")) { return opcode; }
+        }
+        //Direct MOVE.
+        else if (parameters[0].StartsWith("$") || parameters[0].StartsWith("^"))
+        {
+            if (parameters[1].Equals("A")) {
+                //Direct move to GPA.
+                operand = "14";
+            }
+            else if (parameters[1].Equals("B")) {
+                //Direct move to GPB.
+                operand = "15";
+            }
+            Debug.Log("direct move");
+            //Extract the data (minus the brackets).
+            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
+            //Number is invalid.
+            if (opcode.Equals("\0")) { return opcode; }
+        }
+        //MOVE GPB to GPA
+        else if (parameters[0].Equals("A") && parameters[1].Equals("B"))
+        {
+            operand = "16";
+        }
+        //MOVE GPA to GPB
+        else if (parameters[0].Equals("B") && parameters[1].Equals("A"))
+        {
+            operand = "17";
+        }
+        //MOVE GPA or GPB to direct address
+        else if (parameters[1].StartsWith("$") || parameters[1].StartsWith("^"))
+        {
+            if (parameters[0].Equals("A")) {
+                //direct store from GPA.
+                operand = "18";
+            }
+            else if (parameters[0].Equals("B")) {
+                //direct store from GPB.
+                operand = "19";
+            }
+            Debug.Log("indirect move");
+            //Extract the data (minus the brackets).
+            opcode = ExtractData(parameters[1], lineNumber).Substring(2);
+            //Number is invalid.
+            if (opcode.Equals("\0")) { return opcode; }
+        }
+        //MOVE GPA or GPB to indirect address
+        else if (parameters[1].StartsWith("(") && parameters[1].EndsWith(")"))
+        {
+            if (parameters[0].Equals("A"))
+            {
+                //Indirect store from GPA.
+                operand = "1A";
+            }
+            else if (parameters[0].Equals("B"))
+            {
+                //Indirect store from GPB.
+                operand = "1B";
+            }
+            //Extract the data (minus the brackets).
+            opcode = ExtractData(parameters[1].Substring(1, parameters[1].Length - 2), lineNumber).Substring(2);
+            //Number is invalid.
+            if (opcode.Equals("\0")) { return opcode; }
         }
         else
         {

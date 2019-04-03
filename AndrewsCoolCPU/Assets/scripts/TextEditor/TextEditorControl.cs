@@ -4,8 +4,15 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class TextEditorControl : MonoBehaviour
-{
+/**
+ * @brief   Controls the text editor.
+ * @extends MonoBehaviour
+ * @author  Andrew Alford
+ * @date    01/04/2019
+ * @version 1.0 - 01/04/2019
+ */
+public class TextEditorControl : MonoBehaviour {
+
     //[textEditor] The editor this script is controlling.
     [SerializeField] private TextEditor textEditor = null;
 
@@ -23,6 +30,7 @@ public class TextEditorControl : MonoBehaviour
 
     private IEnumerator Start() {
         yield return StartCoroutine(UploadProgram("currentProgram"));
+        UpdateProgram();
     }
 
     private IEnumerator UploadProgram(string fileName) {
@@ -49,6 +57,10 @@ public class TextEditorControl : MonoBehaviour
         textEditor.LoadPorgram(program.name, program.code);
     }
 
+    public void UpdateProgram() {
+        program.code = textEditor.GetProgram();
+    }
+
     /**
      * @brief Attempts to assemble the currently loaded program.
      */
@@ -59,6 +71,7 @@ public class TextEditorControl : MonoBehaviour
         }
 
         currentlyProcessing = true;
+        UpdateProgram();
         assembler.AssembleProgram(program);
         currentlyProcessing = false;
     }

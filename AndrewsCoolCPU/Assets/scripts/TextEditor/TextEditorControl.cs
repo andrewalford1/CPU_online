@@ -6,6 +6,9 @@ using UnityEngine.Networking;
 
 public class TextEditorControl : MonoBehaviour
 {
+    //[textEditor] The editor this script is controlling.
+    [SerializeField] private TextEditor textEditor = null;
+
     //[memory] A reference to the memory programs are loaded onto.
     [SerializeField] MemoryListControl memory = null;
 
@@ -43,6 +46,7 @@ public class TextEditorControl : MonoBehaviour
             program = JsonUtility.FromJson<Program>(json);
             currentlyProcessing = false;
         }
+        textEditor.LoadPorgram(program.name, program.code);
     }
 
     /**

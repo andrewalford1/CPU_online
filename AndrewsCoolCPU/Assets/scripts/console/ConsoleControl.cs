@@ -154,8 +154,13 @@ public class ConsoleControl : MonoBehaviour {
                 CU.Reset();
                 return true;
             case ("\\RUN"):
-                LogCommand(text);
-                StartCoroutine(CU.RunCycle());
+                if(CU.IsRunning()) {
+                    CONSOLE.LogError("CU is already running.");
+                }
+                else {
+                    LogCommand(text);
+                    StartCoroutine(CU.RunCycle());
+                }
                 return true;
             case ("\\ASSEMBLE"):
                 LogCommand(text);

@@ -152,6 +152,10 @@ public class ControlUnit : MonoBehaviour
         return loading;
     }
 
+    public bool IsRunning() {
+        return running;
+    }
+
     public IEnumerator RunCycle() {
         if(currentlyProcessing) {
             Debug.Log("Cannot run program as CPU is currently processing.");
@@ -163,7 +167,8 @@ public class ControlUnit : MonoBehaviour
                 yield return DecodeCycle();
                 yield return ExecuteCycle();                
             }
-            
+            running = false;
+            play_pause.GetComponent<ImageControlBtn>().SetImage(!running);
         }
     }
 

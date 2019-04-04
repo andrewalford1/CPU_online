@@ -11,11 +11,7 @@ using UnityEngine.UI;
  * @date    04/04/19
  * @version 1.0 - 04/04/19
  */
-public class ImageControlBtn : MonoBehaviour {
-
-    //[button] The button this scrip affects.
-    [SerializeField] private Button button = null;
-    
+public class ImageControlBtn : MonoBehaviour {   
     //[imageToControl] The buttons image being controlled.
     [SerializeField]  private Image imageToControl = null;
     

@@ -8,18 +8,14 @@ using UnityEngine.UI;
  * @extends MonoBehaviour
  * @author  Andrew Alford
  * @date    03/04/2019
- * @version 1.0 - 03/04/2019
+ * @version 1.1 - 04/04/2019
  */
 public class TextEditor : MonoBehaviour
 {
-    //[programName] Displays the name of the currently loaded program.
-    [SerializeField] private Text programName = null;
-
     //[editor] The area where user's write their code.
     [SerializeField] private InputField editor = null;
 
-    public void LoadPorgram(string programName, List<string> content) {
-        this.programName.text = programName;
+    public void LoadPorgram(List<string> content) {
         editor.text = "\0";
 
         for(int i = 0; i < content.Count; i++) {

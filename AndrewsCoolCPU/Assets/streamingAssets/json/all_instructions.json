@@ -3,7 +3,7 @@
   "dateCreated" : "31/03/2019",
   "timeCreated" : "18:02",
   "description" : "A program written by a user",
-  "assembled" : true,
+  "assembled" : false,
   "code" : [
     "ORG $00",
     "MOVE $10,A",
@@ -16,12 +16,6 @@
 
   ],
   "data" : [
-    "0000",
-    "0001",
-    "0002",
-    "0003",
-    "0004",
-    "0005",
-    "FF00"
+
   ]
 }

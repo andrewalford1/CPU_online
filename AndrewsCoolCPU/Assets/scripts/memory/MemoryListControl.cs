@@ -107,6 +107,8 @@ public class MemoryListControl : MonoBehaviour {
 
             //Point the PC to the first instruction to be fetched.
             PC.Write(startPoint.GetHex());
+
+            ConsoleControl.CONSOLE.LogMessage("Program Successfully loaded.");
            
             return true;
         }

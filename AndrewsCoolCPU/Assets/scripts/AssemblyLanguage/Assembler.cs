@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /**
@@ -281,8 +280,8 @@ public class Assembler
                 operand = "03";
             }
             Debug.Log("direct add");
-            //Extract the data (minus the brackets).
-            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
+            //Extract the data.
+            opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }
@@ -351,8 +350,8 @@ public class Assembler
                 //Direct sub to GPB.
                 operand = "09";
             }
-            //Extract the data (minus the brackets).
-            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
+            //Extract the data.
+            opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }
@@ -417,8 +416,8 @@ public class Assembler
                 //Direct cmp to GPB.
                 operand = "0F";
             }
-            //Extract the data (minus the brackets).
-            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
+            //Extract the data.
+            opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }
@@ -487,7 +486,7 @@ public class Assembler
             }
             Debug.Log("direct move");
             //Extract the data (minus the brackets).
-            opcode = ExtractData(parameters[0], lineNumber).Substring(2);
+            opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }
@@ -514,7 +513,7 @@ public class Assembler
             }
             Debug.Log("indirect move");
             //Extract the data (minus the brackets).
-            opcode = ExtractData(parameters[1], lineNumber).Substring(2);
+            opcode = ExtractData(parameters[1], lineNumber);
             //Number is invalid.
             if (opcode.Equals("\0")) { return opcode; }
         }

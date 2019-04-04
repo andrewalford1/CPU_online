@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 
 /**
@@ -9,7 +9,7 @@ using UnityEngine.Networking;
  * @extends MonoBehaviour
  * @author  Andrew Alford
  * @date    01/04/2019
- * @version 1.0 - 01/04/2019
+ * @version 1.1 - 04/04/2019
  */
 public class TextEditorControl : MonoBehaviour {
 
@@ -18,6 +18,11 @@ public class TextEditorControl : MonoBehaviour {
 
     //[memory] A reference to the memory programs are loaded onto.
     [SerializeField] MemoryListControl memory = null;
+
+    //[assembleButton] Button to assemble the currently loaded program.
+    [SerializeField] Button assembleBtn = null;
+    //[loadBtn] Button to load the assembled program.
+    [SerializeField] Button loadBtn = null;
 
     //[program] The program currently loaded into the text editor.
     private Program program = null;
@@ -29,7 +34,9 @@ public class TextEditorControl : MonoBehaviour {
     private bool currentlyProcessing = false;
 
     private IEnumerator Start() {
-        yield return StartCoroutine(UploadProgram("currentProgram"));
+        assembleBtn.onClick.AddListener(delegate { Assemble(); });
+        loadBtn.onClick.AddListener(delegate { LoadIntoMemory(); });
+        yield return StartCoroutine(UploadProgram("defualt_program"));
         UpdateProgram();
     }
 
@@ -54,7 +61,7 @@ public class TextEditorControl : MonoBehaviour {
             program = JsonUtility.FromJson<Program>(json);
             currentlyProcessing = false;
         }
-        textEditor.LoadPorgram(program.name, program.code);
+        textEditor.LoadPorgram(program.code);
     }
 
     public void UpdateProgram() {
@@ -67,6 +74,10 @@ public class TextEditorControl : MonoBehaviour {
     public void Assemble() {
         if(currentlyProcessing) {
             ConsoleControl.CONSOLE.LogError("Cannot assemble program as Text Editor is currently processing.");
+            return;
+        }
+        else if (program.code.Count <= 0) {
+            ConsoleControl.CONSOLE.LogError("Program does not contain any code.");
             return;
         }
 
@@ -95,14 +106,12 @@ public class TextEditorControl : MonoBehaviour {
         }
         else if(program.errors.Count > 0)
         {
-            ConsoleControl.CONSOLE.LogError("Program: " + program.name 
-                + " has errors and cannot be loaded.");
+            ConsoleControl.CONSOLE.LogError("Program has errors and cannot be loaded.");
             return;
         }
         else if(program.data.Count <= 0)
         {
-            ConsoleControl.CONSOLE.LogError("Program: " + program.name +
-                " does not contain any data.");
+            ConsoleControl.CONSOLE.LogError("Program does not contain any data.");
             return;
         }
 

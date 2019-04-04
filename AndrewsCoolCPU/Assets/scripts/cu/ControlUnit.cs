@@ -31,6 +31,14 @@ public class ControlUnit : MonoBehaviour
     [SerializeField] private Clock                      clock                   = null;
     //BUSES
     [SerializeField] private BusControl                 busSystem               = null;
+    //BUTTONS
+    [SerializeField] private Button assemble = null;
+    [SerializeField] private Button loadToMemory = null;
+    [SerializeField] private Button play_pause = null;
+    [SerializeField] private Button fetch = null;
+    [SerializeField] private Button decode = null;
+    [SerializeField] private Button execute = null;
+    [SerializeField] private Button reset = null;
 
     //[instructionSet] Holds all the instructions that the CU can perform.
     private List<Instruction> instructionSet = new List<Instruction>();
@@ -42,6 +50,8 @@ public class ControlUnit : MonoBehaviour
     private bool currentlyProcessing = false;
     //[loading] 'True' whilst the CU is initialising.
     private bool loading = true;
+    //[running] 'True' whilst the CU is running the F/D/E cycle continously.
+    private bool running = false;
 
     /**
      * @brief Inialise the Control Unit.
@@ -61,7 +71,25 @@ public class ControlUnit : MonoBehaviour
         //Set up the first instruction in the CU.
         SetCurrentInstructionFromCU(0);
 
+        //Set up the buttons.
+        InitialiseButtons();
+
         loading = false;
+    }
+
+    private void InitialiseButtons() {
+        fetch.onClick.AddListener(delegate { StartCoroutine(FetchCycle()); });
+        decode.onClick.AddListener(delegate { StartCoroutine(DecodeCycle()); });
+        execute.onClick.AddListener(delegate { StartCoroutine(ExecuteCycle()); });
+        reset.onClick.AddListener(delegate { Reset(); });
+        play_pause.onClick.AddListener(delegate
+        {
+            running = !running;
+            play_pause.GetComponent<ImageControlBtn>().SetImage(!running);
+            if (running) {
+                StartCoroutine(RunCycle());
+            }
+        });
     }
 
     /**
@@ -72,20 +100,16 @@ public class ControlUnit : MonoBehaviour
         string json;
 
         //Check if we should use UnityWebRequest or File.ReadAllBytes
-        if (url.Contains("://") || url.Contains(":///"))
-        {
+        if (url.Contains("://") || url.Contains(":///")) {
             UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
             json = www.downloadHandler.text;
-        }
-        else
-        {
+        } else {
             json = File.ReadAllText(url);
         }
 
         foreach (Instruction instruction in JsonUtility
-            .FromJson<InstructionSet>(json).instructions)
-        {
+            .FromJson<InstructionSet>(json).instructions) {
             instructionSet.Add(instruction);
         }
     }
@@ -101,6 +125,12 @@ public class ControlUnit : MonoBehaviour
         GPA.SetActive(!currentlyProcessing);
         GPB.SetActive(!currentlyProcessing);
         ALU.SetActive(!currentlyProcessing);
+        assemble.interactable       = !currentlyProcessing;
+        loadToMemory.interactable   = !currentlyProcessing;
+        fetch.interactable          = !currentlyProcessing;
+        decode.interactable         = !currentlyProcessing;
+        execute.interactable        = !currentlyProcessing;
+        reset.interactable          = !currentlyProcessing;
         if (memory.IsActive() && currentlyProcessing) {
             memory.SetActive(false);
         } else if(!memory.IsActive() && !currentlyProcessing) {
@@ -126,10 +156,12 @@ public class ControlUnit : MonoBehaviour
         if(currentlyProcessing) {
             Debug.Log("Cannot run program as CPU is currently processing.");
         } else {
-            while(currentInstruction.ID != 0xFF) {
+            running = true;
+            play_pause.GetComponent<ImageControlBtn>().SetImage(!running);
+            while (currentInstruction.ID != 0xFF && running) {
                 yield return FetchCycle();
                 yield return DecodeCycle();
-                yield return ExecuteCycle();
+                yield return ExecuteCycle();                
             }
             
         }
@@ -143,6 +175,7 @@ public class ControlUnit : MonoBehaviour
             Debug.Log("Cannot perform fetch as CPU is currently processing.");
         } else {
             currentlyProcessing = true;
+            ConsoleControl.CONSOLE.LogMessage("Performing Fetch Cycle");
             yield return microInstructions.WriteToMar(PC);
             yield return microInstructions.WriteToPC(PC);
             yield return microInstructions.MemoryRead();
@@ -159,6 +192,7 @@ public class ControlUnit : MonoBehaviour
             Debug.Log("Cannot perform decode as CPU is currently processing");
         } else {
             currentlyProcessing = true;
+            ConsoleControl.CONSOLE.LogMessage("Performing Decode Cycle");
 
             yield return microInstructions.WriteToIR(MDR);
 
@@ -183,6 +217,7 @@ public class ControlUnit : MonoBehaviour
             currentlyProcessing = true;
             if (currentInstruction != null) {
                 //Execute the current instruction.
+                ConsoleControl.CONSOLE.LogMessage("Performing Execute Cycle");
                 yield return microInstructions.ExecuteInstrucion(currentInstruction.ID);
             }
             currentlyProcessing = false;

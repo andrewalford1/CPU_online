@@ -1,16 +1,20 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 /**
 * @brief   Helper class to assemble programs.
 * @author  Andrew Alford
 * @date    02/04/2019
-* @version 1.0 - 02/04/2019
+* @version 1.1 - 06/04/2019
 */
 public class Assembler
 {
     //[program] Holds the program currently being assembled.
     private Program program = null;
+
+    //[whiteSpaceRemover] Regex to find white space in a string.
+    Regex whiteSpaceRemover = new Regex("[ ]{1,}");
 
     /**
      * @brief Helper method to wipe the program prior to its assembly.
@@ -27,15 +31,35 @@ public class Assembler
         program.data.Clear();
     }
 
+    /**
+     * @brief Removes all of the white space in the program code.
+     */
+    private void RemoveWhiteSpace() {
+        for(int i = 0; i < program.code.Count; i++) {
+            program.code[i] = whiteSpaceRemover.Replace(program.code[i], "@");
+        }
+    }
+
     public void AssembleProgram(Program programToAssemble) {
         program = programToAssemble;
 
         //Wipe the program clean prior to assembly.
         WipeProgram();
 
+        RemoveWhiteSpace();
+
+        Debug.Log("----start program code----");
+        foreach(string code in program.code) {
+            Debug.Log(code);
+        }
+        Debug.Log("----end program code----");
+
         //Break down insturctions into raw data.
         for (int i = 0; i < program.code.Count; i++) {
-            program.data.Add(GetData(program.code[i], i+1));
+            string data = GetData(program.code[i], i + 1);
+            if(!(data == null)) {
+                program.data.Add(data);
+            }
         }
 
         foreach(string data in program.data) {
@@ -132,23 +156,67 @@ public class Assembler
     //DATA RETRIEVAL...
 
     /**
+     * @brief Breaks down an instruction into it's key components.
+     * @param label         - The section of code (optional)
+     * @param command       - The command to be executed.
+     * @param parameters    - The parameters to be used with the command.
+     * @returns The key components of the instruction.
+     */
+    private List<string> BreakDownInstruction(
+        in string instruction, out string label, 
+        out string command, ref List<string> parameters) {
+        
+        //[components] Will holds all of the components 
+        //which make up the instrucion.
+        List<string> components = new List<string>();
+        
+        //Break down the instruction.
+        string[] breakDown = instruction.Split('@');
+
+        label = "\0";
+        command = "\0";
+
+        Debug.Log(breakDown.Length);
+
+        if(breakDown.Length > 3) {
+            //Unrecognised command.
+            label = "\0";
+            command = "\0";
+        }
+        else if(breakDown.Length == 3) {
+            if(breakDown[0].Length > 0) {
+                label = breakDown[0];
+            }
+            command = breakDown[1];
+            parameters = BreakDownParameters(breakDown[2]);
+        }
+        else if(breakDown.Length == 2) {
+            label = "\0";
+            command = breakDown[0];
+            parameters = BreakDownParameters(breakDown[1]);
+        }
+        else if(breakDown.Length == 1) {
+            label = "\0";
+            command = breakDown[0];
+        }
+
+        return components;
+    }
+
+    /**
      * @brief Breaks down an instruction into raw data. E.g., ADD $23,A becomes 0023.
      * @param instruction - The instruction to be broken down.
      * @param lineNumber - The line the instruction resides on.
      */
     private string GetData(string insturction, int lineNumber) {
 
-        //[instructionBreakDown] Splits the instruction into 
-        //it's command and parameter componenets.
-        string[] instructionBreakDown = insturction.Split(' ');
-
-        //[command] Holds the command component of the instruction.
-        string command = instructionBreakDown[0];
-        //[parameters] Holds any of the instructions parameters.
         List<string> parameters = new List<string>();
+        BreakDownInstruction(insturction, out string label, out string command, ref parameters);
 
-        if(instructionBreakDown.Length > 1) {
-            parameters = BreakDownParameters(instructionBreakDown[1]);
+        Debug.Log(label);
+        Debug.Log(command);
+        foreach(string param in parameters) {
+            Debug.Log(param);
         }
 
         //Calculate the raw data based on the command.
@@ -167,8 +235,8 @@ public class Assembler
                 return CreateHALTCommand(parameters, lineNumber);
         }
 
-
-        return new Number(0x0001).GetHex();
+        NewError(lineNumber, "Unrecognised command"); 
+        return null;
     }
 
     /**
@@ -218,7 +286,7 @@ public class Assembler
         }
 
         NewError(lineNumber, "Unrecognised Number format");
-        return "\0";
+        return null;
     }
 
     //CASE SPECIFIC...
@@ -229,9 +297,9 @@ public class Assembler
      */
     private string CreateORGCommand(List<string> parameters, int lineNumber) {
         //Error check parameters.
-        if (CalledAtWrongTime("ORG", 1, lineNumber)) { return "\0"; }
-        else if (TooManyParameters(parameters, 1, lineNumber)) { return "\0"; }
-        else if (!IsHex(parameters[0], lineNumber)) { return "\0"; }
+        if (CalledAtWrongTime("ORG", 1, lineNumber)) { return null; }
+        else if (TooManyParameters(parameters, 1, lineNumber)) { return null; }
+        else if (!IsHex(parameters[0], lineNumber)) { return null; }
 
         Number command = new Number();
         command.SetNumber("00" + parameters[0].Substring(1));
@@ -244,10 +312,10 @@ public class Assembler
      */
     private string CreateADDCommand(List<string> parameters, int lineNumber) {
         //Error check parameters.
-        if(TooManyParameters(parameters, 2, lineNumber)) { return "\0"; }
+        if(TooManyParameters(parameters, 2, lineNumber)) { return null; }
         else if(parameters[0].Equals(parameters[1])) {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         string operand = "00";
@@ -283,7 +351,7 @@ public class Assembler
             //Extract the data.
             opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //ADD GPB to GPA
         else if(parameters[0].Equals("A") && parameters[1].Equals("B")) {
@@ -295,7 +363,7 @@ public class Assembler
         }
         else {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         Number command = new Number();
@@ -310,11 +378,11 @@ public class Assembler
     private string CreateSUBCommand(List<string> parameters, int lineNumber)
     {
         //Error check parameters.
-        if (TooManyParameters(parameters, 2, lineNumber)) { return "\0"; }
+        if (TooManyParameters(parameters, 2, lineNumber)) { return null; }
         else if (parameters[0].Equals(parameters[1]))
         {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         string operand = "00";
@@ -335,7 +403,7 @@ public class Assembler
             }
             opcode = ExtractData(parameters[0].Substring(1), lineNumber).Substring(2);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //Direct SUB.
         else if (parameters[0].StartsWith("$") || parameters[0].StartsWith("^"))
@@ -353,7 +421,7 @@ public class Assembler
             //Extract the data.
             opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //SUB GPB to GPA
         else if (parameters[0].Equals("A") && parameters[1].Equals("B"))
@@ -368,7 +436,7 @@ public class Assembler
         else
         {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         Number command = new Number();
@@ -383,10 +451,10 @@ public class Assembler
     private string CreateCMPCommand(List<string> parameters, int lineNumber)
     {
         //Error check parameters.
-        if (TooManyParameters(parameters, 2, lineNumber)) { return "\0"; }
+        if (TooManyParameters(parameters, 2, lineNumber)) { return null; }
         else if (parameters[0].Equals(parameters[1])) {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         string operand = "00";
@@ -404,7 +472,7 @@ public class Assembler
             }
             opcode = ExtractData(parameters[0].Substring(1), lineNumber).Substring(2);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //Direct CMP.
         else if (parameters[0].StartsWith("$") || parameters[0].StartsWith("^")) {
@@ -419,7 +487,7 @@ public class Assembler
             //Extract the data.
             opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //CMP GPB to GPA
         else if (parameters[0].Equals("A") && parameters[1].Equals("B")) {
@@ -431,7 +499,7 @@ public class Assembler
         }
         else {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         Number command = new Number();
@@ -446,11 +514,11 @@ public class Assembler
     private string CreateMOVECommand(List<string> parameters, int lineNumber)
     {
         //Error check parameters.
-        if (TooManyParameters(parameters, 2, lineNumber)) { return "\0"; }
+        if (TooManyParameters(parameters, 2, lineNumber)) { return null; }
         else if (parameters[0].Equals(parameters[1]))
         {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         string operand = "00";
@@ -471,7 +539,7 @@ public class Assembler
             }
             opcode = ExtractData(parameters[0].Substring(1), lineNumber).Substring(2);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //Direct MOVE.
         else if (parameters[0].StartsWith("$") || parameters[0].StartsWith("^"))
@@ -488,7 +556,7 @@ public class Assembler
             //Extract the data (minus the brackets).
             opcode = ExtractData(parameters[0], lineNumber);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //MOVE GPB to GPA
         else if (parameters[0].Equals("A") && parameters[1].Equals("B"))
@@ -515,7 +583,7 @@ public class Assembler
             //Extract the data (minus the brackets).
             opcode = ExtractData(parameters[1], lineNumber);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         //MOVE GPA or GPB to indirect address
         else if (parameters[1].StartsWith("(") && parameters[1].EndsWith(")"))
@@ -533,12 +601,12 @@ public class Assembler
             //Extract the data (minus the brackets).
             opcode = ExtractData(parameters[1].Substring(1, parameters[1].Length - 2), lineNumber).Substring(2);
             //Number is invalid.
-            if (opcode.Equals("\0")) { return opcode; }
+            if (opcode.Equals("\0")) { return null; }
         }
         else
         {
             NewError(lineNumber, "Unrecognised command");
-            return "\0";
+            return null;
         }
 
         Number command = new Number();
@@ -552,8 +620,8 @@ public class Assembler
      */
     private string CreateHALTCommand(List<string> parameters, int lineNumber) {
         //Error check parameters.
-        if(CalledAtWrongTime("HALT", program.code.Count, lineNumber)) { return "\0"; }
-        else if(TooManyParameters(parameters, 0, lineNumber)) { return "\0"; }
+        if(CalledAtWrongTime("HALT", program.code.Count, lineNumber)) { return null; }
+        else if(TooManyParameters(parameters, 0, lineNumber)) { return null; }
 
         Number command = new Number();
         command.SetNumber("FF00");

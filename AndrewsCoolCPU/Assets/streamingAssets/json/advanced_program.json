@@ -6,21 +6,20 @@
   "assembled" : false,
   "code" : [
     "ORG $00",
+    "MOVE $10,A",
+	  "MOVE $11,B",
+	  "ADD A,B",
+    "MOVE B,$12",
+    "JSR _sub",
+    "HALT",
     " ",
-    "ADD #$42,A",
-    "ADD #^42,A",
-    "ADD #$42,B",
-    "ADD #^42,B",
+    "_sub   ADD $10,A",
     " ",
-    "ADD $42,A",
-    "ADD ^42,A",
-    "ADD $42,B",
-    "ADD ^42,B",
+    "_sub2  MOVE $10,A",
+    "       CMP A,B",
+    "       SUB ^42,B",
     " ",
-    "ADD A,B",
-    "ADD B,A",
-    " ",
-    "HALT"
+    "_sub3  ADD $42,A"
   ],
   "errors" : [
 

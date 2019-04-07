@@ -169,6 +169,12 @@
       "description": "Store reg. B at a mem. indirect addr"
     },
     {
+      "ID": 28,
+      "ID_HEX": "001C",
+      "command": "\\JSR addr",
+      "description": "Jump to subroutine at a direct address"
+    },
+    {
       "ID": 255,
       "ID_HEX": "00FF",
       "command": "\\HALT",

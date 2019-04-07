@@ -30,8 +30,6 @@ public class TextEditor : MonoBehaviour
     public InputField GetEditor() => editor;
 
     public List<string> GetProgram() {
-        Debug.Log(editor.text);
-
         List<string> code = new List<string>();
         foreach(string lineOfCode in editor.text.Split('\n')) {
             if(!lineOfCode.Equals("")) {

@@ -219,6 +219,11 @@ public class Assembler
             Debug.Log(param);
         }
 
+        //If there is a label do not execute this code.
+        if (!(label == null)) {
+            return null;
+        }
+
         //Calculate the raw data based on the command.
         switch (command) {
             case ("ORG"):

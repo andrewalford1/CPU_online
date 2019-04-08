@@ -351,7 +351,16 @@ public class Assembler_2
                     line.data = CreateORGCommand(ref program, line);
                     break;
                 case ("ADD"):
-                    line.data = CreateAddCommand(ref program, line);
+                    line.data = CreateADDCommand(ref program, line);
+                    break;
+                case ("SUB"):
+                    line.data = CreateSUBCommand(ref program, line);
+                    break;
+                case ("CMP"):
+                    line.data = CreateCMPCommand(ref program, line);
+                    break;
+                case ("MOVE"):
+                    line.data = CreateMOVECommand(ref program, line);
                     break;
                 case ("HALT"):
                     line.data = CreateHALTCommand(ref program, line);
@@ -405,25 +414,26 @@ public class Assembler_2
 
     /**
      * @brief Checks if a given command has been allocated too many parameters.
-     * @param program       - The program being assembled.
-     * @param maxParameters - The maximum amount of parameters allowed.
-     * @param lineOfCode    - The line of code being checked.
+     * @param program                       - The program being assembled.
+     * @param expectedNumberOfParameters    - The maximum amount of parameters 
+     *                                        allowed.
+     * @param lineOfCode                    - The line of code being checked.
      */
-    private bool TooManyParameters(
+    private bool WrongNumberOfParameters(
         ref Program program,
-        in int maxPameters,
+        in int expectedNumberOfParameters,
         in LineOfCode lineOfCode)
     {
 
         //[error] If 'true' then the error has occurred.
-        bool error = lineOfCode.parameters.Count > maxPameters;
+        bool error = lineOfCode.parameters.Count != expectedNumberOfParameters;
 
         //Report the error.
         if(error) {
             NewError(
                 ref program, 
                 lineOfCode.lineNumber, 
-                ("Can only have up to " + maxPameters + " parameters")
+                ("Must only have " + expectedNumberOfParameters + " parameters")
             );
         }
 
@@ -434,15 +444,15 @@ public class Assembler_2
      * @brief Takes a value and parses it as hex.
      * @param program       - The program being assembled.
      * @param data          - The data being parsed.
-     * @param lineNumber    - The line number this data comes from.
+     * @param LINE_NUMBER   - The line number this data comes from.
      * @returns the value in hex format.
      */
-    private string ParseHex(ref Program program, string data, in int lineNumber) {
+    private string ParseHex(ref Program program, string data, in int LINE_NUMBER) {
 
         switch(data.ToCharArray()[0]) {
             case (DECIMAL_SIGNITURE):
                 if(InputValidation.IsDecimal(data)) {
-                    return InputValidation.DecimalToHex(data.Substring(1)).Substring(2);
+                    return InputValidation.DecimalToHex(data.Substring(1));
                 }
                 break;
             case (HEX_SIGNITURE):
@@ -453,20 +463,28 @@ public class Assembler_2
         }
 
         //If the value is unrecognised report it as an error.
-        NewError(ref program, lineNumber, "Unrecognised number format.");
+        NewError(ref program, LINE_NUMBER, "Unrecognised number format.");
 
         return "";
     }
 
     /**
      * @brief Checks if a given piece of data can be used as a valid address.
-     * @param hexData - The data being checked.
+     * @param program       - The program being assembled.
+     * @param hexData       - The data being checked.
+     * @param LINE_NUMBER   - The line number this data comes from.
      * @returns 'true' if the data can be used as an address.
      */
-    private bool IsValidAddress(in string hexData) {
+    private bool IsValidAddress(ref Program program, in int LINE_NUMBER, in string hexData) {
         Number dataAsNumber = new Number();
         dataAsNumber.SetNumber(hexData);
-        return dataAsNumber.GetUnsigned() <= MemoryListControl.NUM_MEMORY_LOCATIONS;
+        if (!(dataAsNumber.GetUnsigned() < MemoryListControl.NUM_MEMORY_LOCATIONS)) {
+            NewError(ref program, LINE_NUMBER, "Address given exceeds memory size");
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     /**
@@ -489,7 +507,7 @@ public class Assembler_2
             }
         }
         //ORG can only have one parameter.
-        if(TooManyParameters(ref program, 1, lineOfCode)) { return ""; }
+        if(WrongNumberOfParameters(ref program, 1, lineOfCode)) { return ""; }
 
         string opcode = "00";
 
@@ -501,11 +519,11 @@ public class Assembler_2
             lineOfCode.lineNumber
         );
 
-        //The operand must be a valid address.
-        if(!IsValidAddress(operand)) { return ""; }
-
-        ///If either the opcode or operand hasn't been calculated then return nothing.
+        //If either the opcode or operand hasn't been calculated then return nothing.
         if(string.IsNullOrEmpty(opcode) || string.IsNullOrEmpty(operand)) { return ""; }
+
+        //The operand must be a valid address.
+        if(!IsValidAddress(ref program, lineOfCode.lineNumber, operand)) { return ""; }
 
         //Retrun the data.
         return opcode + operand;
@@ -516,9 +534,9 @@ public class Assembler_2
      * @param program       - A reference to the program being assembled.
      * @param lineOfCode    - The line of code being translated.
      */
-    private string CreateAddCommand(ref Program program, LineOfCode lineOfCode) {
+    private string CreateADDCommand(ref Program program, LineOfCode lineOfCode) {
         //ADDs can only have two parameters.
-        if (TooManyParameters(ref program, 2, lineOfCode)) { return ""; }
+        if (WrongNumberOfParameters(ref program, 2, lineOfCode)) { return ""; }
         //ADDs cannot have identical parameters.
         if (lineOfCode.parameters[0].Equals(lineOfCode.parameters[1])) { return ""; }
 
@@ -564,11 +582,249 @@ public class Assembler_2
             operand = "00";
         }
 
-        //The operand must be a valid address.
-        if (!IsValidAddress(operand)) { return ""; }
-
-        ///If either the opcode or operand hasn't been calculated then return nothing.
+        //If either the opcode or operand hasn't been calculated then return nothing.
         if (string.IsNullOrEmpty(opcode) || string.IsNullOrEmpty(operand)) { return ""; }
+     
+        //The operand must be a valid address.
+        if (!IsValidAddress(ref program, lineOfCode.lineNumber, operand)) { return ""; }
+
+        //Retrun the data.
+        return opcode + operand;
+    }
+
+    /**
+     * @brief Translates a given line of code into a 'SUB' command.
+     * @param program       - A reference to the program being assembled.
+     * @param lineOfCode    - The line of code being translated.
+     */
+    private string CreateSUBCommand(ref Program program, LineOfCode lineOfCode) {
+        //SUBs can only have two parameters.
+        if (WrongNumberOfParameters(ref program, 2, lineOfCode)) { return ""; }
+        //SUBs cannot have identical parameters.
+        if (lineOfCode.parameters[0].Equals(lineOfCode.parameters[1])) { return ""; }
+
+        string opcode = "";
+        string operand = "";
+
+        //IMMEDIATE SUB
+        if (lineOfCode.parameters[0].StartsWith(IMMEDIATE_ADDRESSING_SIGNATURE.ToString())) {
+            switch (lineOfCode.parameters[1]) {
+                case ("A"): //IMMEDIATE SUB to GPA.
+                    opcode = "06";
+                    break;
+                case ("B"): //IMMEDIATE SUB to GPB.
+                    opcode = "07";
+                    break;
+            }
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0].Substring(1), lineOfCode.lineNumber);
+        }
+        //DIRECT SUB
+        else if (lineOfCode.parameters[0].StartsWith(DECIMAL_SIGNITURE.ToString()) ||
+                lineOfCode.parameters[0].StartsWith(HEX_SIGNITURE.ToString()))
+        {
+            switch (lineOfCode.parameters[1]) {
+                case ("A"): //DIRECT SUB to GPA.
+                    opcode = "08";
+                    break;
+                case ("B"): //DIRECT SUB to GPB.
+                    opcode = "09";
+                    break;
+            }
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0], lineOfCode.lineNumber);
+        }
+        //SUB GPB to GPA
+        else if (lineOfCode.parameters[0].Equals("A") && lineOfCode.parameters[1].Equals("B")) {
+            opcode = "0A";
+            operand = "00";
+        }
+        //SUB GPA to GPB
+        else if (lineOfCode.parameters[0].Equals("B") && lineOfCode.parameters[1].Equals("A")) {
+            opcode = "0B";
+            operand = "00";
+        }
+
+        //If either the opcode or operand hasn't been calculated then return nothing.
+        if (string.IsNullOrEmpty(opcode) || string.IsNullOrEmpty(operand)) { return ""; }
+
+        //The operand must be a valid address.
+        if (!IsValidAddress(ref program, lineOfCode.lineNumber, operand)) { return ""; }
+
+        //Retrun the data.
+        return opcode + operand;
+    }
+    
+    /**
+     * @brief Translates a given line of code into a 'CMP' command.
+     * @param program       - A reference to the program being assembled.
+     * @param lineOfCode    - The line of code being translated.
+     */
+    private string CreateCMPCommand(ref Program program, LineOfCode lineOfCode) {
+        //CMPs can only have two parameters.
+        if (WrongNumberOfParameters(ref program, 2, lineOfCode)) { return ""; }
+        //CMPs cannot have identical parameters.
+        if (lineOfCode.parameters[0].Equals(lineOfCode.parameters[1])) { return ""; }
+
+        string opcode = "";
+        string operand = "";
+
+        //IMMEDIATE CMP
+        if (lineOfCode.parameters[0].StartsWith(IMMEDIATE_ADDRESSING_SIGNATURE.ToString()))
+        {
+            switch (lineOfCode.parameters[1])
+            {
+                case ("A"): //IMMEDIATE CMP to GPA.
+                    opcode = "0C";
+                    break;
+                case ("B"): //IMMEDIATE CMP to GPB.
+                    opcode = "0D";
+                    break;
+            }
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0].Substring(1), lineOfCode.lineNumber);
+        }
+        //DIRECT CMP
+        else if (lineOfCode.parameters[0].StartsWith(DECIMAL_SIGNITURE.ToString()) ||
+                lineOfCode.parameters[0].StartsWith(HEX_SIGNITURE.ToString()))
+        {
+            switch (lineOfCode.parameters[1])
+            {
+                case ("A"): //DIRECT CMP to GPA.
+                    opcode = "0E";
+                    break;
+                case ("B"): //DIRECT CMP to GPB.
+                    opcode = "0F";
+                    break;
+            }
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0], lineOfCode.lineNumber);
+        }
+        //CMP GPB to GPA
+        else if (lineOfCode.parameters[0].Equals("A") && lineOfCode.parameters[1].Equals("B"))
+        {
+            opcode = "10";
+            operand = "00";
+        }
+        //CMP GPA to GPB
+        else if (lineOfCode.parameters[0].Equals("B") && lineOfCode.parameters[1].Equals("A"))
+        {
+            opcode = "11";
+            operand = "00";
+        }
+
+        //If either the opcode or operand hasn't been calculated then return nothing.
+        if (string.IsNullOrEmpty(opcode) || string.IsNullOrEmpty(operand)) { return ""; }
+
+        //The operand must be a valid address.
+        if (!IsValidAddress(ref program, lineOfCode.lineNumber, operand)) { return ""; }
+
+        //Retrun the data.
+        return opcode + operand;
+    }
+
+    /**
+     * @brief Translates a given line of code into a 'MOVE' command.
+     * @param program       - A reference to the program being assembled.
+     * @param lineOfCode    - The line of code being translated.
+     */
+    private string CreateMOVECommand(ref Program program, LineOfCode lineOfCode) {
+        //MOVEs can only have two parameters.
+        if (WrongNumberOfParameters(ref program, 2, lineOfCode)) { return ""; }
+        //MOVEs cannot have identical parameters.
+        if (lineOfCode.parameters[0].Equals(lineOfCode.parameters[1])) { return ""; }
+
+        string opcode = "";
+        string operand = "";
+
+        //IMMEDIATE MOVE
+        if (lineOfCode.parameters[0].StartsWith(IMMEDIATE_ADDRESSING_SIGNATURE.ToString()))
+        {
+            switch (lineOfCode.parameters[1])
+            {
+                case ("A"): //IMMEDIATE MOVE to GPA.
+                    opcode = "12";
+                    break;
+                case ("B"): //IMMEDIATE MOVE to GPB.
+                    opcode = "13";
+                    break;
+            }
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0].Substring(1), lineOfCode.lineNumber);
+        }
+        //DIRECT MOVE
+        else if (lineOfCode.parameters[0].StartsWith(DECIMAL_SIGNITURE.ToString()) ||
+                lineOfCode.parameters[0].StartsWith(HEX_SIGNITURE.ToString()))
+        {
+            switch (lineOfCode.parameters[1])
+            {
+                case ("A"): //DIRECT MOVE to GPA.
+                    opcode = "14";
+                    break;
+                case ("B"): //DIRECT MOVE to GPB.
+                    opcode = "15";
+                    break;
+            }
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0], lineOfCode.lineNumber);
+        }
+        //MOVE GPB to GPA
+        else if (lineOfCode.parameters[0].Equals("A") && lineOfCode.parameters[1].Equals("B"))
+        {
+            opcode = "16";
+            operand = "00";
+        }
+        //MOVE GPA to GPB
+        else if (lineOfCode.parameters[0].Equals("B") && lineOfCode.parameters[1].Equals("A"))
+        {
+            opcode = "17";
+            operand = "00";
+        }
+        //DIRECT STORE
+        else if (lineOfCode.parameters[1].StartsWith(DECIMAL_SIGNITURE.ToString()) ||
+                lineOfCode.parameters[1].StartsWith(HEX_SIGNITURE.ToString()))
+        {
+            switch (lineOfCode.parameters[0])
+            {
+                case ("A"): //DIRECT STORE from GPA.
+                    opcode = "18";
+                    break;
+                case ("B"): //DIRECT STORE from GPB.
+                    opcode = "19";
+                    break;
+            }
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[1], lineOfCode.lineNumber);
+        }
+        //INDIRECT STORE
+        else if (lineOfCode.parameters[1].StartsWith("(") ||
+              lineOfCode.parameters[1].StartsWith(")"))
+        {
+            switch (lineOfCode.parameters[0])
+            {
+                case ("A"): //INDIRECT STORE from GPA.
+                    opcode = "1A";
+                    break;
+                case ("B"): //INDIRECT STORE from GPB.
+                    opcode = "1B";
+                    break;
+            }
+
+            //Remove the brackets from the address.
+            lineOfCode.parameters[1] = lineOfCode.parameters[1].Substring(
+                1, 
+                lineOfCode.parameters[1].Length - 2
+            );
+
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[1], lineOfCode.lineNumber);
+        }
+
+        //If either the opcode or operand hasn't been calculated then return nothing.
+        if (string.IsNullOrEmpty(opcode) || string.IsNullOrEmpty(operand)) { return ""; }
+
+        //The operand must be a valid address.
+        if (!IsValidAddress(ref program, lineOfCode.lineNumber, operand)) { return ""; }
 
         //Retrun the data.
         return opcode + operand;
@@ -585,7 +841,7 @@ public class Assembler_2
             return "";
         }
         //HALT must not have any parameters.
-        if (TooManyParameters(ref program, 0, lineOfCode)) { return ""; }
+        if (WrongNumberOfParameters(ref program, 0, lineOfCode)) { return ""; }
 
         string opcode = "FF";
         string operand = "00";

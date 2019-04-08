@@ -106,6 +106,6 @@ public class InputValidation : MonoBehaviour {
         //Convert the string to a number.
         Number number = new Number(int.Parse(decimalContent));
 
-        return number.GetHex();
+        return number.GetHex().TrimStart('0');
     }
 }

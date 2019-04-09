@@ -465,6 +465,11 @@ PrefabInstance:
       propertyPath: play_pause
       value: 
       objectReference: {fileID: 493415890}
+    - target: {fileID: 8164345316206226851, guid: e58914496711add4fb318ac03b8eecff,
+        type: 3}
+      propertyPath: PSR
+      value: 
+      objectReference: {fileID: 1546617814}
     m_RemovedComponents:
     - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: e58914496711add4fb318ac03b8eecff, type: 3}

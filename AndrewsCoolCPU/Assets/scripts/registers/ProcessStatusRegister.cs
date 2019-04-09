@@ -79,7 +79,7 @@ public class ProcessStatusRegister : MonoBehaviour
     public void SetFlag(FLAGS flag, bool state)
     {
         //[flagSet] If 'true' then this flag is currently set on the PSR.
-        bool flagSet = Convert.ToBoolean((PSRcontent & (byte)flag));
+        bool flagSet = GetState(flag);
 
         //If the flag needs to be set then set it.
         if ((!flagSet && state == Convert.ToBoolean(1)) ||
@@ -92,5 +92,13 @@ public class ProcessStatusRegister : MonoBehaviour
                 "\nNew PSR state: " + ByteToString(PSRcontent));
         }
 
+    }
+
+    /**
+     * @brief Returns the state of a given flag.
+     * @param flag - The flag to be checked.
+     */
+    public bool GetState(FLAGS flag) {
+        return Convert.ToBoolean((PSRcontent & (byte)flag));
     }
 }

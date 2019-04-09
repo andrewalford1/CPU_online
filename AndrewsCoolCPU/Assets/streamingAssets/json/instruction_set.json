@@ -181,6 +181,102 @@
       "description": "Jump to a direct addr"
     },
     {
+      "ID": 30,
+      "ID_HEX": "001E",
+      "command": "\\BCC #data",
+      "description": "Branch to a immediate addr. if carry flag clear (C=0)"
+    },
+    {
+      "ID": 31,
+      "ID_HEX": "001F",
+      "command": "\\BCS #data",
+      "description": "Branch to a immediate addr. if carry flag set (C=1)"
+    },
+    {
+      "ID": 32,
+      "ID_HEX": "0020",
+      "command": "\\BCC addr",
+      "description": "Branch to a direct addr. if carry flag clear (C=0)"
+    },
+    {
+      "ID": 33,
+      "ID_HEX": "0021",
+      "command": "\\BCS addr",
+      "description": "Branch to a direct addr. if carry flag set (C=1)"
+    },
+    {
+      "ID": 34,
+      "ID_HEX": "0022",
+      "command": "\\BPL #data",
+      "description": "Branch to a immediate addr. if negative flag clear (N=0)"
+    },
+    {
+      "ID": 35,
+      "ID_HEX": "0023",
+      "command": "\\BMI #data",
+      "description": "Branch to a immediate addr. if negative flag set (N=1)"
+    },
+    {
+      "ID": 36,
+      "ID_HEX": "0024",
+      "command": "\\BPL addr",
+      "description": "Branch to a direct addr. if negative flag clear (N=0)"
+    },
+    {
+      "ID": 37,
+      "ID_HEX": "0025",
+      "command": "\\BMI addr",
+      "description": "Branch to a direct addr. if negative flag set (N=1)"
+    },
+    {
+      "ID": 38,
+      "ID_HEX": "0026",
+      "command": "\\BNE #data",
+      "description": "Branch to a immediate addr. if zero flag clear (Z=0)"
+    },
+    {
+      "ID": 39,
+      "ID_HEX": "0027",
+      "command": "\\BEQ #data",
+      "description": "Branch to a immediate addr. if negative flag set (Z=1)"
+    },
+    {
+      "ID": 40,
+      "ID_HEX": "0028",
+      "command": "\\BNE addr",
+      "description": "Branch to a direct addr. if zero flag clear (Z=0)"
+    },
+    {
+      "ID": 41,
+      "ID_HEX": "0029",
+      "command": "\\BEQ addr",
+      "description": "Branch to a direct addr. if negative flag set (Z=1)"
+    },
+    {
+      "ID": 42,
+      "ID_HEX": "002A",
+      "command": "\\BVC #data",
+      "description": "Branch to a immediate addr. if zero flag clear (V=0)"
+    },
+    {
+      "ID": 43,
+      "ID_HEX": "002B",
+      "command": "\\BVS #data",
+      "description": "Branch to a immediate addr. if negative flag set (V=1)"
+    },
+    {
+      "ID": 44,
+      "ID_HEX": "002C",
+      "command": "\\BVC addr",
+      "description": "Branch to a direct addr. if zero flag clear (V=0)"
+    },
+    {
+      "ID": 45,
+      "ID_HEX": "002D",
+      "command": "\\BVS addr",
+      "description": "Branch to a direct addr. if negative flag set (V=1)"
+    },
+    {
       "ID": 255,
       "ID_HEX": "00FF",
       "command": "\\HALT",

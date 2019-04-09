@@ -17,6 +17,7 @@ public class MicroInstructions : MonoBehaviour
     private InstructionRegister IR = null;
     private GeneralPurposeRegisterA GPA = null;
     private GeneralPurposeRegisterB GPB = null;
+    private ProcessStatusRegister PSR = null;
     //MEMORY
     private MemoryListControl memory = null;
     //ALU
@@ -34,6 +35,7 @@ public class MicroInstructions : MonoBehaviour
         ProgramCounter PC, MemoryAddressRegister MAR,
         MemoryDataRegister MDR, InstructionRegister IR,
         GeneralPurposeRegisterA GPA, GeneralPurposeRegisterB GPB,
+        ProcessStatusRegister PSR,
         MemoryListControl memory, ArithmeticLogicUnit ALU,
         Clock clock, BusControl busSystem)
     {
@@ -43,6 +45,7 @@ public class MicroInstructions : MonoBehaviour
         this.IR = IR;
         this.GPA = GPA;
         this.GPB = GPB;
+        this.PSR = PSR;
         this.memory = memory;
         this.ALU = ALU;
         this.clock = clock;
@@ -394,7 +397,55 @@ public class MicroInstructions : MonoBehaviour
                 yield return ReadIROperand(PC);
                 break;
             case (0x1D):
-                yield return Instruction_jump_DIRECT();
+                yield return Instruction_DIRECT_jump();
+                break;
+            case (0x1E):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.CARRY, true);
+                break;
+            case (0x1F):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.CARRY, false);
+                break;
+            case (0x20):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.CARRY, true);
+                break;
+            case (0x21):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.CARRY, false);
+                break;
+            case (0x22):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.NEGATIVE, true);
+                break;
+            case (0x23):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.NEGATIVE, false);
+                break;
+            case (0x24):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.NEGATIVE, true);
+                break;
+            case (0x25):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.NEGATIVE, false);
+                break;
+            case (0x26):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.ZERO, true);
+                break;
+            case (0x27):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.ZERO, false);
+                break;
+            case (0x28):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.ZERO, true);
+                break;
+            case (0x29):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.ZERO, false);
+                break;
+            case (0x2A):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.OVERFLOW, true);
+                break;
+            case (0x2B):
+                yield return Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS.OVERFLOW, false);
+                break;
+            case (0x2C):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.OVERFLOW, true);
+                break;
+            case (0x2D):
+                yield return Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS.OVERFLOW, false);
                 break;
         }
     }
@@ -504,9 +555,50 @@ public class MicroInstructions : MonoBehaviour
     /**
      * @brief Jumps to an address using direct addressing.
      */
-    public IEnumerator Instruction_jump_DIRECT() {
+    public IEnumerator Instruction_DIRECT_jump() {
         yield return MemoryDirectFetch();
         yield return WriteToIR(MDR);
         yield return ReadIROperand(PC);
+    }
+    
+    /**
+     * @brief Checks the state of a flag and sets the PC accordingly.
+     * @param flag      - The flag to be checked.
+     * @param onTrue    - If 'true' then the branch only occurs if 
+     *                    the flag is not set. If 'false' then the branch 
+     *                    only occurs if the flag is set.
+     */
+    public IEnumerator Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS flag, bool onClear) {
+        if(!onClear) {
+            if (PSR.GetState(ProcessStatusRegister.FLAGS.CARRY)) {
+                yield return ReadIROperand(PC);
+            }
+        }
+        else {
+            if (!PSR.GetState(ProcessStatusRegister.FLAGS.CARRY))
+            {
+                yield return ReadIROperand(PC);
+            }
+        }
+    }
+
+    /**
+     * @brief Checks the state of a flag and sets the PC accordingly.
+     * @param flag      - The flag to be checked.
+     * @param onTrue    - If 'true' then the branch only occurs if 
+     *                    the flag is not set. If 'false' then the branch 
+     *                    only occurs if the flag is set.
+     */
+    public IEnumerator Instruction_DIRECT_branchOnFlag(ProcessStatusRegister.FLAGS flag, bool onClear) {
+        if (!onClear) {
+            if (PSR.GetState(ProcessStatusRegister.FLAGS.CARRY)) {
+                yield return Instruction_DIRECT_jump();
+            }
+        }
+        else {
+            if (!PSR.GetState(ProcessStatusRegister.FLAGS.CARRY)) {
+                yield return Instruction_DIRECT_jump();
+            }
+        }
     }
 }

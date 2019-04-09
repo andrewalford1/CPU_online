@@ -23,6 +23,7 @@ public class ControlUnit : MonoBehaviour
     [SerializeField] private InstructionRegister        IR                      = null;
     [SerializeField] private GeneralPurposeRegisterA    GPA                     = null;
     [SerializeField] private GeneralPurposeRegisterB    GPB                     = null;
+    [SerializeField] private ProcessStatusRegister      PSR                     = null;
     //MEMORY
     [SerializeField] private MemoryListControl          memory                  = null;
     //ALU
@@ -64,7 +65,7 @@ public class ControlUnit : MonoBehaviour
         //Link in the micro instructions.
         microInstructions = gameObject.GetComponent<MicroInstructions>();
         microInstructions.LinkCPUcomponents(
-            PC, MAR, MDR, IR, GPA, GPB,
+            PC, MAR, MDR, IR, GPA, GPB, PSR,
             memory, ALU, clock, busSystem
         );
 

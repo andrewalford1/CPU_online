@@ -171,8 +171,8 @@
     {
       "ID": 28,
       "ID_HEX": "001C",
-      "command": "\\JSR addr",
-      "description": "Jump to subroutine at a direct address"
+      "command": "\\JMP addr",
+      "description": "Jump to a direct addr"
     },
     {
       "ID": 255,

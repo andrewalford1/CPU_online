@@ -13,7 +13,7 @@ public class ProgramCounter : Register
     public override BusControl.BUS_ROUTE RouteToMAR     => BusControl.BUS_ROUTE.PC_MAR;
     public override BusControl.BUS_ROUTE RouteToMDR     => BusControl.BUS_ROUTE.PC_MDR;
     public override BusControl.BUS_ROUTE RouteToCU      => BusControl.BUS_ROUTE.PC_CU;
-    public override BusControl.BUS_ROUTE RouteToIR      => BusControl.BUS_ROUTE.MDR_IR;
+    public override BusControl.BUS_ROUTE RouteToIR      => BusControl.BUS_ROUTE.PC_IR;
     public override BusControl.BUS_ROUTE RouteToGPA     => BusControl.BUS_ROUTE.PC_GPA;
     public override BusControl.BUS_ROUTE RouteToGPB     => BusControl.BUS_ROUTE.PC_GPB;
     public override BusControl.BUS_ROUTE RouteToALUx    => BusControl.BUS_ROUTE.PC_ALUX;

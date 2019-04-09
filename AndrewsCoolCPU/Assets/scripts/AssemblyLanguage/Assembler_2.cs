@@ -23,6 +23,8 @@ public class Assembler_2
     //[SEPERATOR] Used to visualise where differnet
     //components of instructions begin/end.
     private const char SEPERATOR = '@';
+    //[LABEL_SIGNITURE] Used to identify a labels.
+    private const char LABEL_SIGNITURE = '_';
     //[DECIMAL_SIGNITURE] data that starts with 
     //this value is decimal.
     private const char DECIMAL_SIGNITURE = '^';
@@ -59,22 +61,25 @@ public class Assembler_2
         ExtractMainBody(ref program, out List<LineOfCode> mainBody);
         ExtractSubroutines(ref program, out List<List<LineOfCode>> subroutines);
 
-        //Assemble the code into raw hexidecimal data.
-        GenerateData(ref program, ref mainBody, ref subroutines);
+        MapLabels(ref program, ref mainBody, ref subroutines);
 
-        Debug.Log("----PROGRAM DATA----");
-        foreach(string data in program.data) {
-            Debug.Log(data);
-        }
+        //Assemble the code into raw hexidecimal data.
+        //GenerateData(ref program, ref mainBody, ref subroutines);
+
+        //Debug.Log("----PROGRAM DATA----");
+        //foreach(string data in program.data) {
+        //    Debug.Log(data);
+        //}
+
 
         //TEMP for debugging.
         //Debug.Log("----MAIN BODY----");
         //foreach (LineOfCode line in mainBody)
-        //{
-        //    Debug.Log("Command:\t " + line.command + "\n" +
-        //        "Num Parameters:\t" + line.parameters.Count
-        //    );
-        //}
+        //    {
+        //        Debug.Log("Command:\t " + line.command + "\n" +
+        //            "Num Parameters:\t" + line.parameters.Count
+        //        );
+        //    }
 
         //Debug.Log("----Subroutines----");
         //for (int i = 0; i < subroutines.Count; i++)
@@ -86,7 +91,7 @@ public class Assembler_2
         //            "Num Parameters:\t" + line.parameters.Count
         //        );
         //    }
-        //} 
+        //}
     }
 
     /**
@@ -143,8 +148,8 @@ public class Assembler_2
 
     /**
      * @brief Retrieves the main body of code
-     * @param program - A refence to the program having it's main body extracted.
-     * @param mainBody - A reference to where the main body will be extracted to.
+     * @param program       - A refence to the program having it's main body extracted.
+     * @param mainBody      - A reference to where the main body will be extracted to.
      */
     private void ExtractMainBody(ref Program program, out List<LineOfCode> mainBody) {
         mainBody = new List<LineOfCode>();
@@ -181,8 +186,8 @@ public class Assembler_2
 
     /**
      * @brief Reads through the code and extracts all the subroutines.
-     * @param program - A reference to the program being read.
-     * @param subroutines - Will store the subroutines extacted.
+     * @param program       - A reference to the program being read.
+     * @param subroutines   - Will store the subroutines extacted.
      */
     private void ExtractSubroutines(ref Program program, out List<List<LineOfCode>> subroutines) {
         subroutines = new List<List<LineOfCode>>();
@@ -245,6 +250,96 @@ public class Assembler_2
 
                 //Add the subroutine to the list of subroutines.
                 subroutines.Add(subroutine);
+            }
+        }
+    }
+
+    /**
+     * @brief Finds all matching labels and maps them together.
+     * @param program       - A reference to the program being assembled.
+     * @param mainBody      - The main body of code being assembled.
+     * @param subroutines   - A list of all subroutines being assembled.
+     */
+    private void MapLabels(ref Program program, ref List<LineOfCode> mainBody, ref List<List<LineOfCode>> subroutines) {
+
+        //Find all references to labels in the code.
+        FindLabelReferences(mainBody, subroutines, out List<string> labels, out Dictionary<string, List<int>> references);
+
+        Dictionary<string, int> subroutineLabels = new Dictionary<string, int>();
+
+        foreach(List<LineOfCode> subroutine in subroutines) {
+            if(subroutine.Count > 0) {
+                subroutineLabels.Add(subroutine[0].label, subroutine[0].lineNumber);
+            }
+        }
+
+        //Read all label references.
+        Debug.Log("----Label references----");
+        for(int i = 0; i < references.Count; i++) {
+            Debug.Log("Label:\t" + labels[i] + " Occurs on lines...");
+            foreach(int lineNumber in references[labels[i]]) {
+                Debug.Log(lineNumber);
+            }
+        }
+
+        //Debug.Log("----Subroutine labels----");
+        //for(int i = 0; i < subroutineLabels.Count; i++) {
+        //    Debug.Log("label:\t")
+        //}
+    }
+
+    /**
+     * @brief Reads through a program and finds all the references to labels.
+     * @param mainBody      - The main body of code being read through.
+     * @param subroutines   - A list of all subroutines being read through.
+     * @param labels        - Will store all the labels found.
+     * @param references    - Will store the line numbers the labels were 
+     *                        found on.
+     */
+    private void FindLabelReferences(
+        in List<LineOfCode> mainBody, 
+        in List<List<LineOfCode>> subroutines, 
+        out List<string> labels, 
+        out Dictionary<string, List<int>> references)
+    {
+        labels = new List<string>();
+        references = new Dictionary<string, List<int>>();
+
+        //Read through the main body of code and find any label references.
+        foreach (LineOfCode line in mainBody) {
+            foreach(string parameter in line.parameters) {
+                if(parameter.StartsWith(LABEL_SIGNITURE.ToString())) {
+                    //Add the label reference.
+                    if (references.ContainsKey(parameter)) {
+                        references[parameter].Add(line.lineNumber);
+                    }
+                    else {
+                        labels.Add(parameter);
+                        List<int> occurrances = new List<int> { line.lineNumber };
+                        //Add the label reference.
+                        references.Add(parameter, occurrances);
+                    }
+                }
+            }
+        }
+        
+        //Read through all subroutines and find any label references.
+        foreach(List<LineOfCode> subroutine in subroutines) {
+            foreach(LineOfCode line in subroutine) {
+                foreach(string parameter in line.parameters) {
+                    if(parameter.StartsWith(LABEL_SIGNITURE.ToString())) {
+                        //Add the label reference.
+                        if (references.ContainsKey(parameter)) {
+                            references[parameter].Add(line.lineNumber);
+                        }
+                        else {
+                            labels.Add(parameter);
+                            List<int> occurrances = new List<int> { line.lineNumber };
+                            //Add the label reference.
+                            references.Add(parameter, occurrances);
+                        }
+                    }
+                }
             }
         }
     }
@@ -364,6 +459,9 @@ public class Assembler_2
                     break;
                 case ("HALT"):
                     line.data = CreateHALTCommand(ref program, line);
+                    break;
+                case ("JMP"):
+                    line.data = CreateJMPCommand(ref program, line);
                     break;
             }
 
@@ -818,6 +916,37 @@ public class Assembler_2
 
             //Convert the parameter to hexidecimal to retrieve the address.
             operand = ParseHex(ref program, lineOfCode.parameters[1], lineOfCode.lineNumber);
+        }
+
+        //If either the opcode or operand hasn't been calculated then return nothing.
+        if (string.IsNullOrEmpty(opcode) || string.IsNullOrEmpty(operand)) { return ""; }
+
+        //The operand must be a valid address.
+        if (!IsValidAddress(ref program, lineOfCode.lineNumber, operand)) { return ""; }
+
+        //Retrun the data.
+        return opcode + operand;
+    }
+
+    /**
+     * @brief Translates a given line of code into a 'JMP' command.
+     * @param program - A reference to the program being assembled.
+     * @param lineOfCode - The line of code being translated.
+     */
+    private string CreateJMPCommand(ref Program program, LineOfCode lineOfCode) {
+        //JMPs can only have one parameter.
+        if (WrongNumberOfParameters(ref program, 1, lineOfCode)) { return ""; }
+
+        string opcode = "";
+        string operand = "";
+
+        //DIRECT JMP
+        if (lineOfCode.parameters[0].StartsWith(DECIMAL_SIGNITURE.ToString()) ||
+                lineOfCode.parameters[0].StartsWith(HEX_SIGNITURE.ToString()))
+        {
+            opcode = "1C";
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0], lineOfCode.lineNumber);
         }
 
         //If either the opcode or operand hasn't been calculated then return nothing.

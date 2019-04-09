@@ -390,6 +390,9 @@ public class MicroInstructions : MonoBehaviour
             case (0x1B):
                 yield return Instruction_moveToMemory_INDIRECT(GPB);
                 break;
+            case (0x1C):
+                yield return Instruction_jump_DIRECT();
+                break;
         }
     }
 
@@ -493,5 +496,14 @@ public class MicroInstructions : MonoBehaviour
         yield return WriteToMDR(x);
         yield return ReadIROperand(MAR);
         yield return MemoryWrite();
+    }
+
+    /**
+     * @brief Jumps to an address using direct addressing.
+     */
+    public IEnumerator Instruction_jump_DIRECT() {
+        yield return MemoryDirectFetch();
+        yield return WriteToIR(MDR);
+        yield return ReadIROperand(PC);
     }
 }

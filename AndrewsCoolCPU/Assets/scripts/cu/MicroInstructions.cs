@@ -391,6 +391,9 @@ public class MicroInstructions : MonoBehaviour
                 yield return Instruction_moveToMemory_INDIRECT(GPB);
                 break;
             case (0x1C):
+                yield return ReadIROperand(PC);
+                break;
+            case (0x1D):
                 yield return Instruction_jump_DIRECT();
                 break;
         }

@@ -64,22 +64,23 @@ public class Assembler_2
         MapLabels(ref program, ref mainBody, ref subroutines);
 
         //Assemble the code into raw hexidecimal data.
-        //GenerateData(ref program, ref mainBody, ref subroutines);
+        GenerateData(ref program, ref mainBody, ref subroutines);
 
-        //Debug.Log("----PROGRAM DATA----");
-        //foreach(string data in program.data) {
-        //    Debug.Log(data);
-        //}
-
+        //If no errors occurred then the program was sucessfully assembled.
+        program.assembled = program.errors.Count == 0;
 
         //TEMP for debugging.
         //Debug.Log("----MAIN BODY----");
         //foreach (LineOfCode line in mainBody)
-        //    {
-        //        Debug.Log("Command:\t " + line.command + "\n" +
-        //            "Num Parameters:\t" + line.parameters.Count
-        //        );
+        //{
+        //    if (!string.IsNullOrEmpty(line.label)) {
+        //        Debug.Log(line.label);
         //    }
+        //    Debug.Log("Command:\t " + line.command);
+        //    foreach (string parameter in line.parameters) {
+        //        Debug.Log("parameter:\t" + parameter);
+        //    }
+        //}
 
         //Debug.Log("----Subroutines----");
         //for (int i = 0; i < subroutines.Count; i++)
@@ -87,9 +88,14 @@ public class Assembler_2
         //    Debug.Log("Subroutine: " + i);
         //    foreach (LineOfCode line in subroutines[i])
         //    {
-        //        Debug.Log("Command:\t " + line.command + "\n" +
-        //            "Num Parameters:\t" + line.parameters.Count
-        //        );
+        //        Debug.Log(i + ": new line...");
+        //        if(!string.IsNullOrEmpty(line.label)) {
+        //            Debug.Log(line.label);
+        //        }
+        //        Debug.Log("Command:\t " + line.command);
+        //        foreach(string parameter in line.parameters) {
+        //            Debug.Log("parameter:\t" + parameter);
+        //        }
         //    }
         //}
     }
@@ -260,16 +266,71 @@ public class Assembler_2
      * @param mainBody      - The main body of code being assembled.
      * @param subroutines   - A list of all subroutines being assembled.
      */
-    private void MapLabels(ref Program program, ref List<LineOfCode> mainBody, ref List<List<LineOfCode>> subroutines) {
+    private void MapLabels(
+        ref Program program, 
+        ref List<LineOfCode> mainBody, 
+        ref List<List<LineOfCode>> subroutines
+    ) {
 
         //Find all references to labels in the code.
-        FindLabelReferences(mainBody, subroutines, out List<string> labels, out Dictionary<string, List<int>> references);
+        FindLabelReferences(
+            mainBody, 
+            subroutines, 
+            out List<string> labels, 
+            out Dictionary<string, List<int>> references
+        );
 
         Dictionary<string, int> subroutineLabels = new Dictionary<string, int>();
 
         foreach(List<LineOfCode> subroutine in subroutines) {
             if(subroutine.Count > 0) {
                 subroutineLabels.Add(subroutine[0].label, subroutine[0].lineNumber);
+            }
+        }
+
+        //[dataSize] How big the assembled code will be.
+        int dataSize = mainBody.Count;
+        //[subroutineIndexes] Where each subroutine will start in the main collection of data.
+        Dictionary<string, string> subroutineIndexes = new Dictionary<string, string>();
+
+        //Find which subroutines are being used and work out where they will occur in the code.
+        foreach(List<LineOfCode> subroutine in subroutines) {
+            LineOfCode openingLine = subroutine[0];
+            if(references.ContainsKey(openingLine.label)) {
+                string lineNumberHex = InputValidation.DecimalToHex(
+                    (openingLine.lineNumber - 2).ToString()
+                );
+                if(lineNumberHex.ToCharArray().Length == 1) { 
+                    lineNumberHex = lineNumberHex.Insert(0, "0");
+                }
+                if(IsValidAddress(ref program, openingLine.lineNumber, lineNumberHex)) {
+                    Debug.Log(lineNumberHex);
+                    subroutineIndexes.Add(openingLine.label, "#$" + lineNumberHex);
+                    dataSize += subroutine.Count;
+                }
+            }
+        }
+
+        //Map addresses in the main body.
+        foreach(LineOfCode line in mainBody) {
+            for(int i = 0; i < line.parameters.Count; i++) {
+                if(line.parameters[i].StartsWith(LABEL_SIGNITURE.ToString())) {
+                    if(subroutineIndexes.ContainsKey(line.parameters[i])) {
+                        line.parameters[i] = subroutineIndexes[line.parameters[i]];
+                    }
+                }
+            }
+        }
+        //Map addresses in the subroutines.
+        foreach(List<LineOfCode> subroutine in subroutines) {
+            foreach(LineOfCode line in subroutine) {
+                for(int i = 0; i < line.parameters.Count; i++) {
+                    if(line.parameters[i].StartsWith(LABEL_SIGNITURE.ToString())) {
+                        if(subroutineIndexes.ContainsKey(line.parameters[i])) {
+                            line.parameters[i] = subroutineIndexes[line.parameters[i]];
+                        }
+                    }
+                }
             }
         }
 
@@ -438,7 +499,13 @@ public class Assembler_2
         ref List<LineOfCode> mainBody,
         ref List<List<LineOfCode>> subroutines)
     {
-        foreach(LineOfCode line in mainBody) {
+        List<LineOfCode> codeBase = mainBody;
+
+        foreach(List<LineOfCode> subroutine in subroutines) {
+            codeBase.AddRange(subroutine);
+        }
+
+        foreach(LineOfCode line in codeBase) {
 
             //Execute the given command.
             switch (line.command) {
@@ -466,7 +533,7 @@ public class Assembler_2
             }
 
 
-            //If data was generate then add it.
+            //If data was generated then add it.
             if (!string.IsNullOrEmpty(line.data)) {
                 program.data.Add(line.data);
             }
@@ -479,6 +546,12 @@ public class Assembler_2
                     "Unrecognised command"
                 );
             }
+        }
+
+        //Temp for testing
+        Debug.Log("----Program Data----");
+        foreach (string data in program.data) {
+            Debug.Log(data);
         }
     }
 
@@ -940,11 +1013,19 @@ public class Assembler_2
         string opcode = "";
         string operand = "";
 
+        //IMMEDIATE JMP
+        if (lineOfCode.parameters[0].StartsWith(IMMEDIATE_ADDRESSING_SIGNATURE.ToString())) {
+
+            opcode = "1C";
+
+            //Convert the parameter to hexidecimal to retrieve the address.
+            operand = ParseHex(ref program, lineOfCode.parameters[0].Substring(1), lineOfCode.lineNumber);
+        }
         //DIRECT JMP
         if (lineOfCode.parameters[0].StartsWith(DECIMAL_SIGNITURE.ToString()) ||
                 lineOfCode.parameters[0].StartsWith(HEX_SIGNITURE.ToString()))
         {
-            opcode = "1C";
+            opcode = "1D";
             //Convert the parameter to hexidecimal to retrieve the address.
             operand = ParseHex(ref program, lineOfCode.parameters[0], lineOfCode.lineNumber);
         }

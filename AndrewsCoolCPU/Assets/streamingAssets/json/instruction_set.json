@@ -171,6 +171,12 @@
     {
       "ID": 28,
       "ID_HEX": "001C",
+      "command": "\\JMP #data",
+      "description": "Jump to a immediate addr"
+    },
+    {
+      "ID": 29,
+      "ID_HEX": "001D",
       "command": "\\JMP addr",
       "description": "Jump to a direct addr"
     },

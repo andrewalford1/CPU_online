@@ -114,8 +114,10 @@ public class TextEditorControl : MonoBehaviour {
             ConsoleControl.CONSOLE.LogError("Program does not contain any data.");
             return;
         }
+        else {
+            memory.LoadProgram(program);
+        }
 
-        memory.LoadProgram(program);
         currentlyProcessing = false;
     }
 }

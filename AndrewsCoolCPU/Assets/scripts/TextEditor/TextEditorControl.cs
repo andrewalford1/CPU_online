@@ -27,7 +27,7 @@ public class TextEditorControl : MonoBehaviour {
     //[program] The program currently loaded into the text editor.
     private Program program = null;
 
-    private Assembler_2 assembler = new Assembler_2();
+    private Assembler assembler = new Assembler();
 
     //[currentlyProecssing] 'True' whilst the text editor is in use. 
     //(Prevents multiple operations occurring at once).

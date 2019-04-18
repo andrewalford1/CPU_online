@@ -569,13 +569,14 @@ public class MicroInstructions : MonoBehaviour
      *                    only occurs if the flag is set.
      */
     public IEnumerator Instruction_IMMEDIATE_branchOnFlag(ProcessStatusRegister.FLAGS flag, bool onClear) {
+        Debug.Log("Flag:\t" + onClear);
         if(!onClear) {
-            if (PSR.GetState(ProcessStatusRegister.FLAGS.CARRY)) {
+            if (PSR.GetState(flag)) {
                 yield return ReadIROperand(PC);
             }
         }
         else {
-            if (!PSR.GetState(ProcessStatusRegister.FLAGS.CARRY))
+            if (!PSR.GetState(flag))
             {
                 yield return ReadIROperand(PC);
             }

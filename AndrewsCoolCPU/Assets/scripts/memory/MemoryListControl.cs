@@ -175,17 +175,17 @@ public class MemoryListControl : MonoBehaviour {
      * @brief Allows you to set the memory location being focused on.
      * @param ID - The ID of the memory location to be focused on.
      */
-    public void SetPointer(int ID) {
+    public void SetPointer(int id) {
         //Check the given ID is in range.
-        if (ID > (slots.Count - 1) || ID < 0)
+        if (id > (slots.Count - 1) || id < 0)
         {
             throw new System.ArgumentOutOfRangeException("The given ID is out of range");
         }
         else
         {
             //Allocate the new pointer ID.
-            pointer = ID;
-            memoryLocationsUI[ID].GetComponent<Image>().enabled = true;
+            pointer = id;
+            memoryLocationsUI[id].GetComponent<Image>().enabled = true;
             Debug.Log("slot pointer set to: " + pointer);
         }
     }

@@ -17,7 +17,7 @@ public class ArithmeticLogicUnit : MonoBehaviour {
     private Number z = new Number();
 
     //[active] While 'true' the ALU can be interacted with.
-    protected bool active = true;
+    private bool active = true;
 
     //[CIRCUITRY] Defines the different 
     //types of circuitry for the ALU.

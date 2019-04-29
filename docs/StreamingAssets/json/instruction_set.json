@@ -1,0 +1,286 @@
+{
+  "instructions": [
+    {
+      "ID": 0,
+      "ID_HEX": "0000",
+      "command": "\\ADD #data,A",
+      "description": "Add to reg. A an immediate oper"
+    },
+    {
+      "ID": 1,
+      "ID_HEX": "0001",
+      "command": "\\ADD #data,B",
+      "description": "Add to reg. B an immediate oper"
+    },
+    {
+      "ID": 2,
+      "ID_HEX": "0002",
+      "command": "\\ADD addr,A",
+      "description": "Add to reg. A from a direct addr"
+    },
+    {
+      "ID": 3,
+      "ID_HEX": "0003",
+      "command": "\\ADD addr,B",
+      "description": "Add to reg. B from a direct addr"
+    },
+    {
+      "ID": 4,
+      "ID_HEX": "0004",
+      "command": "\\ADD A,B",
+      "description": "Add B reg. to contents of A reg"
+    },
+    {
+      "ID": 5,
+      "ID_HEX": "0005",
+      "command": "\\ADD B,A",
+      "description": "Add A reg. to contents of B reg"
+    },
+    {
+      "ID": 6,
+      "ID_HEX": "0006",
+      "command": "\\SUB #data,A",
+      "description": "Subtract an immediate oper. from A reg"
+    },
+    {
+      "ID": 7,
+      "ID_HEX": "0007",
+      "command": "\\SUB #data,B",
+      "description": "Subtract an immediate oper. from B reg"
+    },
+    {
+      "ID": 8,
+      "ID_HEX": "0008",
+      "command": "\\SUB addr,A",
+      "description": "Subtract from reg. A a direct oper"
+    },
+    {
+      "ID": 9,
+      "ID_HEX": "0009",
+      "command": "\\SUB addr,B",
+      "description": "Subtract from reg. B a direct oper"
+    },
+    {
+      "ID": 10,
+      "ID_HEX": "000A",
+      "command": "\\SUB B,A",
+      "description": "Subtract from reg. A the contents of reg B"
+    },
+    {
+      "ID": 11,
+      "ID_HEX": "000B",
+      "command": "\\SUB A,B",
+      "description": "Subtract from reg. B the contents of reg A"
+    },
+    {
+      "ID": 12,
+      "ID_HEX": "000C",
+      "command": "\\CMP #data,A",
+      "description": "Compare an immediate oper. with A reg"
+    },
+    {
+      "ID": 13,
+      "ID_HEX": "000D",
+      "command": "\\CMP #data,B",
+      "description": "Compare an immediate oper. with B reg"
+    },
+    {
+      "ID": 14,
+      "ID_HEX": "000E",
+      "command": "\\CMP addr,A",
+      "description": "Compare a direct oper. with A reg"
+    },
+    {
+      "ID": 15,
+      "ID_HEX": "000F",
+      "command": "\\CMP addr,B",
+      "description": "Compare a direct oper. with B reg"
+    },
+    {
+      "ID": 16,
+      "ID_HEX": "0010",
+      "command": "\\CMP B,A",
+      "description": "Compare A and B reg"
+    },
+    {
+      "ID": 17,
+      "ID_HEX": "0011",
+      "command": "\\CMP A,B",
+      "description": "Compare B and A reg"
+    },
+    {
+      "ID": 18,
+      "ID_HEX": "0012",
+      "command": "\\MOVE #data,A",
+      "description": "Move an immediate oper. into A"
+    },
+    {
+      "ID": 19,
+      "ID_HEX": "0013",
+      "command": "\\MOVE #data,B",
+      "description": "Move an immediate oper. into B"
+    },
+    {
+      "ID": 20,
+      "ID_HEX": "0014",
+      "command": "\\MOVE addr,A",
+      "description": "Load reg. A from a direct addr"
+    },
+    {
+      "ID": 21,
+      "ID_HEX": "0015",
+      "command": "\\MOVE addr,B",
+      "description": "Load reg. B from a direct addr"
+    },
+    {
+      "ID": 22,
+      "ID_HEX": "0016",
+      "command": "\\MOVE B,A",
+      "description": "Move B reg. to A reg"
+    },
+    {
+      "ID": 23,
+      "ID_HEX": "0017",
+      "command": "\\MOVE A,B",
+      "description": "Move A reg. to B reg"
+    },
+    {
+      "ID": 24,
+      "ID_HEX": "0018",
+      "command": "\\MOVE A,addr",
+      "description": "Store the A reg. in memory at a direct addr"
+    },
+    {
+      "ID": 25,
+      "ID_HEX": "0019",
+      "command": "\\MOVE B,addr",
+      "description": "Store the B reg. in memory at a direct addr"
+    },
+    {
+      "ID": 26,
+      "ID_HEX": "001A",
+      "command": "\\MOVE A,(addr)",
+      "description": "Store reg. A at a mem. indirect addr"
+    },
+    {
+      "ID": 27,
+      "ID_HEX": "001B",
+      "command": "\\MOVE B,(addr)",
+      "description": "Store reg. B at a mem. indirect addr"
+    },
+    {
+      "ID": 28,
+      "ID_HEX": "001C",
+      "command": "\\JMP #data",
+      "description": "Jump to a immediate addr"
+    },
+    {
+      "ID": 29,
+      "ID_HEX": "001D",
+      "command": "\\JMP addr",
+      "description": "Jump to a direct addr"
+    },
+    {
+      "ID": 30,
+      "ID_HEX": "001E",
+      "command": "\\BCC #data",
+      "description": "Branch to a immediate addr. if carry flag clear (C=0)"
+    },
+    {
+      "ID": 31,
+      "ID_HEX": "001F",
+      "command": "\\BCS #data",
+      "description": "Branch to a immediate addr. if carry flag set (C=1)"
+    },
+    {
+      "ID": 32,
+      "ID_HEX": "0020",
+      "command": "\\BCC addr",
+      "description": "Branch to a direct addr. if carry flag clear (C=0)"
+    },
+    {
+      "ID": 33,
+      "ID_HEX": "0021",
+      "command": "\\BCS addr",
+      "description": "Branch to a direct addr. if carry flag set (C=1)"
+    },
+    {
+      "ID": 34,
+      "ID_HEX": "0022",
+      "command": "\\BPL #data",
+      "description": "Branch to a immediate addr. if negative flag clear (N=0)"
+    },
+    {
+      "ID": 35,
+      "ID_HEX": "0023",
+      "command": "\\BMI #data",
+      "description": "Branch to a immediate addr. if negative flag set (N=1)"
+    },
+    {
+      "ID": 36,
+      "ID_HEX": "0024",
+      "command": "\\BPL addr",
+      "description": "Branch to a direct addr. if negative flag clear (N=0)"
+    },
+    {
+      "ID": 37,
+      "ID_HEX": "0025",
+      "command": "\\BMI addr",
+      "description": "Branch to a direct addr. if negative flag set (N=1)"
+    },
+    {
+      "ID": 38,
+      "ID_HEX": "0026",
+      "command": "\\BNE #data",
+      "description": "Branch to a immediate addr. if zero flag clear (Z=0)"
+    },
+    {
+      "ID": 39,
+      "ID_HEX": "0027",
+      "command": "\\BEQ #data",
+      "description": "Branch to a immediate addr. if negative flag set (Z=1)"
+    },
+    {
+      "ID": 40,
+      "ID_HEX": "0028",
+      "command": "\\BNE addr",
+      "description": "Branch to a direct addr. if zero flag clear (Z=0)"
+    },
+    {
+      "ID": 41,
+      "ID_HEX": "0029",
+      "command": "\\BEQ addr",
+      "description": "Branch to a direct addr. if negative flag set (Z=1)"
+    },
+    {
+      "ID": 42,
+      "ID_HEX": "002A",
+      "command": "\\BVC #data",
+      "description": "Branch to a immediate addr. if zero flag clear (V=0)"
+    },
+    {
+      "ID": 43,
+      "ID_HEX": "002B",
+      "command": "\\BVS #data",
+      "description": "Branch to a immediate addr. if negative flag set (V=1)"
+    },
+    {
+      "ID": 44,
+      "ID_HEX": "002C",
+      "command": "\\BVC addr",
+      "description": "Branch to a direct addr. if zero flag clear (V=0)"
+    },
+    {
+      "ID": 45,
+      "ID_HEX": "002D",
+      "command": "\\BVS addr",
+      "description": "Branch to a direct addr. if negative flag set (V=1)"
+    },
+    {
+      "ID": 255,
+      "ID_HEX": "00FF",
+      "command": "\\HALT",
+      "description": "Halt processor"
+    }
+  ]
+}

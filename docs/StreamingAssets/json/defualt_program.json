@@ -1,0 +1,30 @@
+{
+  "name" : "My First Assembly Program",
+  "dateCreated" : "31/03/2019",
+  "timeCreated" : "18:02",
+  "description" : "A program written by a user",
+  "assembled" : false,
+  "code" : [
+    "       ORG   $00",
+    " ",
+    "       MOVE  #$42,A",
+    "       MOVE  #$64,B",
+    "       SUB   A,B",
+    "       BMI   _true",
+    "       JMP   _false",
+    " ",
+    "_true  ADD   A,B",
+    "       MOVE  A,$FF",
+    "       JMP   _endMe",
+    " ",
+    "_false JMP _endMe",
+    " ",
+    "_endMe HALT"
+  ],
+  "errors" : [
+
+  ],
+  "data" : [
+
+  ]
+}

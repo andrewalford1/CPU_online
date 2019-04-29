@@ -1,0 +1,21 @@
+{
+  "name" : "My First Assembly Program",
+  "dateCreated" : "31/03/2019",
+  "timeCreated" : "18:02",
+  "description" : "A program written by a user",
+  "assembled" : false,
+  "code" : [
+    "ORG $00",
+    "MOVE $10,A",
+	  "MOVE $11,B",
+	  "ADD A,B",
+	  "MOVE B,$12",
+    "HALT"
+  ],
+  "errors" : [
+
+  ],
+  "data" : [
+
+  ]
+}

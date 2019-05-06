@@ -9,7 +9,7 @@ using UnityEngine;
  * @date 12/02/2019
  * @version 1.0 - 12/02/2019
  */
-[CreateAssetMenu(menuName = "GP_Register")]
+[CreateAssetMenu(menuName = "GP Register")]
 public class GeneralPurposeRegister : Register
 {
 

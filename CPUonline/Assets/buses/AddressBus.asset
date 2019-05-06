@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e53a4e34988d7b4cb662b3ae5f687c3, type: 3}
+  m_Name: AddressBus
+  m_EditorClassIdentifier: 
+  id: address_bus
+  input: {fileID: 11400000, guid: ab60596d61f820545a2d0eb652134bb0, type: 2}
+  output: {fileID: 11400000, guid: 4d8a66cf34653134e92fc598bfe688f9, type: 2}

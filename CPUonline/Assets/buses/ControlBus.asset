@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3106fc022b1190746a97b8c137780357, type: 3}
+  m_Name: ControlBus
+  m_EditorClassIdentifier: 
+  id: control_bus
+  input: {fileID: 11400000, guid: 97d9b6f27b895444b8378868a7c8776e, type: 2}
+  output: {fileID: 11400000, guid: 181d410590be4d24bbf8d6b1b4da0c81, type: 2}

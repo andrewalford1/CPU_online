@@ -72,9 +72,9 @@ public class InputValidation : MonoBehaviour
      * @brief Fills in the blanks with 0's to represent hex values.
      * @param content - This is the content to be filled.
      * @param characterLimit - How many characters the content should have.
-     * @return Returns the filled content. E.g., "A" would become "000A".
+     * @returns The filled content. E.g., "A" would become "000A".
      */
-    static public string fillBlanks(string content, uint characterLimit)
+    static public string FillBlanks(string content, uint characterLimit)
     {
         //Fill in any blank spaces with 0's.
         if (content.Length < characterLimit)

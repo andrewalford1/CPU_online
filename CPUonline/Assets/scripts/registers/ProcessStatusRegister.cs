@@ -18,14 +18,14 @@ public class ProcessStatusRegister : ScriptableObject
     //[FLAGS] All of the different flags held in the PSR.
     public enum FLAGS : byte
     {
-        CARRY = 0b00000001,     //C
-        ZERO = 0b00000010,     //Z 
-        INTERRUPT_DISABLE = 0b00000100,     //I
-        DECIMAL_MODE = 0b00001000,     //D
-        BREAK_COMMAND = 0b00010000,     //B
-        UNUSED = 0b00100000,     //-
-        OVERFLOW = 0b01000000,     //V
-        NEGATIVE = 0b10000000      //N
+        CARRY       =   0b00000001,     //C
+        ZERO        =   0b00000010,     //Z 
+        NEGATIVE    =   0b00000100,     //N
+        OVERFLOW    =   0b00001000,     //V
+        UNUSED1     =   0b00010000,     //-
+        UNUSED2     =   0b00100000,     //-
+        UNUSED3     =   0b01000000,     //-
+        UNUSED4     =   0b10000000      //-
     }
 
     //[STARTING_CONTENT] Holds the starting content of the register.
@@ -41,30 +41,30 @@ public class ProcessStatusRegister : ScriptableObject
      * @brief Allocates an input field to this register.
      * @param inputField - The input field to be allocated.
      */
-    public void allocateInputField(InputField inputField)
+    public void AllocateInputField(InputField inputField)
     {
         input = inputField;
-        input.text = byteToString(PSRcontent);
+        input.text = ByteToString(PSRcontent);
         //Reset the PSR as values have been changed.
-        reset();
+        Reset();
     }
 
     /**
      * @brief Resets the contents of the PSR.
      */
-    public void reset()
+    public void Reset()
     {
         PSRcontent = STARTING_CONTENT;
-        input.text = byteToString(PSRcontent);
+        input.text = ByteToString(PSRcontent);
     }
 
     /**
      * @brief Reads the value of the PSR.
      * @return Returns the PSRs content as a string.
      */
-    public string read()
+    public string Read()
     {
-        return byteToString(PSRcontent);
+        return ByteToString(PSRcontent);
     }
 
     /**
@@ -72,9 +72,9 @@ public class ProcessStatusRegister : ScriptableObject
      * @param data - This is the byte to be converted.
      * @return Returns the converted string.
      */
-    private string byteToString(byte data)
+    private string ByteToString(byte data)
     {
-        return System.Convert.ToString(data, 2).PadLeft(8, '0');
+        return Convert.ToString(data, 2).PadLeft(8, '0');
     }
 
     /**
@@ -82,20 +82,20 @@ public class ProcessStatusRegister : ScriptableObject
      * @param flag  -   The flag to be set.
      * @param state -   The sate to set the flag (1/0).
      */
-    public void setFlag(FLAGS flag, bool state)
+    public void SetFlag(FLAGS flag, bool state)
     {
         //[flagSet] If 'true' then this flag is currently set on the PSR.
-        bool flagSet = System.Convert.ToBoolean((PSRcontent & (byte)flag));
+        bool flagSet = Convert.ToBoolean((PSRcontent & (byte)flag));
 
         //If the flag needs to be set then set it.
-        if ((!flagSet && state == System.Convert.ToBoolean(1)) ||
-            (flagSet && state == System.Convert.ToBoolean(0)))
+        if ((!flagSet && state == Convert.ToBoolean(1)) ||
+            (flagSet && state == Convert.ToBoolean(0)))
         {
             //Toggle the flag.
             PSRcontent ^= (byte)flag;
-            input.text = byteToString(PSRcontent);
+            input.text = ByteToString(PSRcontent);
             Debug.Log("Setting flag: " + flag +
-                "\nNew PSR state: " + byteToString(PSRcontent));
+                "\nNew PSR state: " + ByteToString(PSRcontent));
         }
 
     }

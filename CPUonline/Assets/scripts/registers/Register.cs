@@ -9,18 +9,12 @@ using UnityEngine.UI;
  * @extends SimulatorComponent
  * @author Andrew Alford
  * @date 12/02/2019
- * @version 2.4 - 05/03/2019
+ * @version 3.0 - 14/03/2019
  */
 public abstract class Register : SimulatorComponent
 {
-    //[MAX_VALUE] The maxium value that a register can hold.
-    protected const ushort MAX_VALUE = 0xFFFF;
-
-    //[STARTING_CONTENT] Holds the starting content for the register.
-    protected const ushort STARTING_CONTENT = 0x0000;
-
-    //[decimalContent] Stores the content of the register in decimal format.
-    protected ushort decimalContent = STARTING_CONTENT;
+    //[contents] Stores the contents of the register.
+    protected Number contents = new Number();
 
     //[input] An input field for users to interact with this register.
     protected InputField input = null;
@@ -29,7 +23,7 @@ public abstract class Register : SimulatorComponent
      * @brief Allocates an input field to this register.
      * @param inputField - The input field to be allocated.
      */
-    public virtual void allocateInputField(InputField inputField)
+    public virtual void AllocateInputField(InputField inputField)
     {
         input = inputField;
 
@@ -38,29 +32,17 @@ public abstract class Register : SimulatorComponent
         { return InputValidation.validateAsHex(addedChar); };
         input.onEndEdit.AddListener(delegate {
             InputValidation.fillBlanks_Register(input);
-            write(input.text);
+            Write(input.text);
         });
     }
 
     /**
      * @brief Resets the register.
      */
-    public void reset()
+    public void Reset()
     {
-        decimalContent = STARTING_CONTENT;
-        input.text = InputValidation.fillBlanks((STARTING_CONTENT).ToString("X"), 4);
-    }
-
-    /**
-     * @brief Retrieves the content held in the register.
-     * @return Returns the content held in the register.
-     */
-    public string read()
-    {
-        Debug.Log(this.getID() + ": read - " + decimalContent);
- 
-        //Convert the registers content to a hexadecimal string and return it.
-        return InputValidation.fillBlanks(decimalContent.ToString("X"), 4);
+        contents.Reset();
+        input.text = contents.GetHex();
     }
 
     /**
@@ -69,25 +51,32 @@ public abstract class Register : SimulatorComponent
      * @return Returns the content held in the register
      *         in decimal integer format.
      */
-    public int readAsDecimalInt()
+    public int ReadInt()
     {
-        Debug.Log(this.getID() + ": read - " + decimalContent);
+        Debug.Log(getID() + ": read - " + contents.ToString());
+        return contents.GetSigned();
+    }
 
-        return decimalContent;
+    /**
+     * @brief Retrieves the content held in the register.
+     * @return Returns the content held in the register.
+     */
+    public string ReadString()
+    {
+        Debug.Log(getID() + ": read - " + contents.ToString());
+        return contents.GetHex();
     }
 
     /**
      * @brief Sets the content of the register.
      * @param content - The new content for the register.
      */
-    public void write(string content)
+    public void Write(string content)
     {
-        //Convert the input from a hex string to decimal format.
-        decimalContent = ushort.Parse(
-            InputValidation.fillBlanks(content, 4), 
-            System.Globalization.NumberStyles.HexNumber
-        );
-
-        Debug.Log(this.getID() + ": write - " + decimalContent);
+        contents.SetNumber(content);
+        input.text = contents.GetHex();
+        Debug.Log(getID() + ": write - " + contents.ToString());
+        ConsoleControl.CONSOLE.logMessage(getID() + ": write - ");
+        ConsoleControl.CONSOLE.logMessage("Decimal:\t" + contents.GetSigned() + "\nHex:\t" + contents.GetHex());
     }
 }

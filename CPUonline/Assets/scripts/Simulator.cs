@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
 /**
  * @brief Class to manage the behaviour of the simulator.
@@ -17,16 +18,28 @@ public class Simulator : MonoBehaviour
     [SerializeField] private MemoryAddressRegister MAR = null;
     [SerializeField] private MemoryDataRegister MDR = null;
     [SerializeField] private InstructionRegister IR = null;
+    [SerializeField] private GeneralPurposeRegister GP_A = null;
+    [SerializeField] private ProcessStatusRegister PSR = null;
 
     //REGISTER INPUTS
     [SerializeField] private InputField PC_input = null;
     [SerializeField] private InputField MAR_input = null;
     [SerializeField] private InputField MDR_input = null;
     [SerializeField] private InputField IR_input = null;
+    [SerializeField] private InputField GP_A_input = null;
+    [SerializeField] private InputField PSR_input = null;
 
     //MEMORY
-    [SerializeField] private GameObject memoryList = null;
-    private MemoryListControl memory = null;
+    [SerializeField] private MemoryListControl memory = null;
+
+    //ALU
+    [SerializeField] private ArithmeticLogicUnit ALU = null;
+
+    //ALU INPUTS
+    [SerializeField] private InputField ALUx_input = null;
+    [SerializeField] private InputField ALUy_input = null;
+    [SerializeField] private InputField ALUz_input = null;
+    [SerializeField] private Text ALU_circuitry = null;
 
     //BUTTONS
     [SerializeField] private Button reset = null;
@@ -36,57 +49,81 @@ public class Simulator : MonoBehaviour
      */
     void Start()
     {
-        //Link memory to the simulator.
-        memory = memoryList.GetComponentsInChildren<MemoryListControl>()[0];
-
         //Assign input fields to registers.
-        PC.allocateInputField(PC_input);
-        MAR.allocateInputField(MAR_input);
-        MDR.allocateInputField(MDR_input);
-        IR.allocateInputField(IR_input);
+        PC.AllocateInputField(PC_input);
+        MAR.AllocateInputField(MAR_input);
+        MDR.AllocateInputField(MDR_input);
+        IR.AllocateInputField(IR_input);
+        GP_A.AllocateInputField(GP_A_input);
+        PSR.AllocateInputField(PSR_input);
+
+        //Assign input fields to the ALU.
+        ALU.AllocatedInputFields(ALUx_input, ALUy_input, ALUz_input, ALU_circuitry);
+        ALU.LinkPSR(PSR);
 
         //Add listener to the 'reset' button.
         reset.onClick.AddListener(delegate
         {
             //Empty memory.
-            memory.emptyMemory();
+            memory.EmptyMemory();
             //Reset registers.
-            PC.reset();
-            MAR.reset();
-            MDR.reset();
-            IR.reset();
+            PC.Reset();
+            MAR.Reset();
+            MDR.Reset();
+            IR.Reset();
+            GP_A.Reset();
+            PSR.Reset();
+            //Reset the ALU.
+            ALU.Reset();
 
-            Debug.Log("Simulator Reset");
+            ConsoleControl.CONSOLE.logMessage("Reset");
         });
     }
 
     /**
      * @brief Perform a fetch on the CPU.
      */
-    public void fetch()
+    public void Fetch()
     {
-        Debug.Log("Performing CPU Fetch");
+        ConsoleControl.CONSOLE.logMessage("Performing CPU Fetch");
 
         //Check the content of the PC.
-        PC.write(PC_input.text);
+        PC.Write(PC_input.text);
 
         //Write the content of PC to MAR.
-        MAR.write(PC.read());
-        MAR_input.text = MAR.read();
+        MAR.Write(PC.ReadString());
+        MAR_input.text = MAR.ReadString();
 
         //Increment the PC.
-        PC.increment();
-        PC_input.text = PC.read();
+        PC.Increment();
+        PC_input.text = PC.ReadString();
 
         //Set the memory pointer to the value of the MAR.
-        memory.setPointer(MAR.readAsDecimalInt());
+        memory.SetPointer(MAR.ReadInt());
 
         //Write the contents of the memory address being pointed to into MDR.
-        MDR.write(memory.readFromMemorySlot());
-        MDR_input.text = MDR.read();
+        MDR.Write(memory.ReadFromMemorySlot());
+        MDR_input.text = MDR.ReadString();
 
         //Copy the contents of the MDR to the instruction register.
-        IR.write(MDR.read());
-        IR_input.text = IR.read();
+        IR.Write(MDR.ReadString());
+        IR_input.text = IR.ReadString();
+    }
+
+    public void Execute()
+    {
+        ConsoleControl.CONSOLE.logMessage("Performing CPU Execute");
+
+        //Copy the contents of IR into ALUx.
+        ALU.WriteX(IR.ReadString());
+        ALUx_input.text = IR.ReadString();
+
+        //Compute ALUz.
+        ALU.ComputeZ();
+        ALUz_input.text = ALU.ReadZ();
+
+        //Copy the contents of ALUz into GP A.
+        GP_A.Write(ALU.ReadZ());
+        GP_A_input.text = GP_A.ReadString();
     }
 }

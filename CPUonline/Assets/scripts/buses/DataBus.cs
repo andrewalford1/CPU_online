@@ -62,15 +62,15 @@ public class DataBus : Bus
         {
             Debug.Log("A to B");
             //Transfer data from A to B.
-            registerB.write(registerA.read());
-            registerB_UI.text = registerA.read();
+            registerB.Write(registerA.ReadString());
+            registerB_UI.text = registerA.ReadString();
         }
         else
         {
             Debug.Log("B to A");
             //Transfer data from B to A.
-            registerA.write(registerB.read());
-            registerA_UI.text = registerB.read();
+            registerA.Write(registerB.ReadString());
+            registerA_UI.text = registerB.ReadString();
         }
 
     }

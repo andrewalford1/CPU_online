@@ -8,22 +8,16 @@ using UnityEngine.UI;
  * @extends MonoBehaviour
  * @author Andrew Alford
  * @date 03/03/2019
- * @version 1.2 - 06/03/2019
+ * @version 1.3 - 14/03/2019
  */
 public class ArithmeticLogicUnit : MonoBehaviour
 {
-    //[MAX_VALUE] The maximum value that the ALU can hold.
-    private const ushort MAX_VALUE = 0xFFFF;
-
-    //[STARTING_CONTENT] Holds the starting content for the ALU fields.
-    protected const ushort STARTING_CONTENT = 0x0000;
-
     //[x] Stores the value of ALUx (parameter A).
-    private ushort x = STARTING_CONTENT;
+    private Number x = new Number();
     //[y] Stores the value of ALUy (Parameter B).
-    private ushort y = STARTING_CONTENT;
+    private Number y = new Number();
     //[z] Stores the value of ALUz (Calculation using A and B).
-    private ushort z = STARTING_CONTENT;
+    private Number z = new Number();
 
     //[CIRCUITRY] Defines the different 
     //types of circuitry for the ALU.
@@ -36,7 +30,7 @@ public class ArithmeticLogicUnit : MonoBehaviour
     }
 
     //[defualtCircuitry] The defualt circuitry used by the ALU.
-    private CIRCUITRY defualtCircuitry = CIRCUITRY.ADDITION;
+    private readonly CIRCUITRY defualtCircuitry = CIRCUITRY.ADDITION;
     //[currentCircuitry] The circuitry currently 
     //being used by the ALU.
     private CIRCUITRY currentCircuitry = CIRCUITRY.ADDITION;
@@ -50,21 +44,16 @@ public class ArithmeticLogicUnit : MonoBehaviour
     //[input_z] An input field for users to interact with ALU z.
     private InputField input_z = null;
 
+    //[PSR] The Process Status Register, used to show the states of ALU calculations.
     private ProcessStatusRegister PSR;
 
     /**
      * @brief Links the PSR to the ALU to show the state of operations.
      * @param psr - The PSR to be linked.
      */
-    public void linkPSR(ProcessStatusRegister psr)
+    public void LinkPSR(ProcessStatusRegister psr)
     {
         PSR = psr;
-
-        //Turn on the decimal flag since this ALU works in base 10.
-        PSR.setFlag(
-            ProcessStatusRegister.FLAGS.DECIMAL_MODE,
-            System.Convert.ToBoolean(1)
-        );
     }
 
     /**
@@ -74,7 +63,7 @@ public class ArithmeticLogicUnit : MonoBehaviour
      * @param input_z - The input field to be binded to ALU z.
      * @param circuitry - A graphical representation of the ALU's circuitry.
      */
-    public void allocatedInputFields(
+    public void AllocatedInputFields(
         InputField xInput,
         InputField yInput,
         InputField zInput,
@@ -94,203 +83,150 @@ public class ArithmeticLogicUnit : MonoBehaviour
         { return InputValidation.validateAsHex(addedChar); };
         input_x.onEndEdit.AddListener(delegate {
             InputValidation.fillBlanks_Register(input_x);
-            writeX(input_x.text);
+            WriteX(input_x.text);
         });
         input_y.onEndEdit.AddListener(delegate {
             InputValidation.fillBlanks_Register(input_y);
-            writeY(input_y.text);
+            WriteY(input_y.text);
         });
         input_z.onEndEdit.AddListener(delegate {
             InputValidation.fillBlanks_Register(input_z);
         });
 
         //Wipe the slate clean after fields have been altered.
-        this.reset();
+        Reset();
     }
 
     /**
      * @brief Resets the ALU back to it's starting state.
      */
-    public void reset()
+    public void Reset()
     {
-        this.setCircuitry(defualtCircuitry);
-        x = STARTING_CONTENT;
-        y = STARTING_CONTENT;
-        z = STARTING_CONTENT;
-        input_x.text = InputValidation.fillBlanks((STARTING_CONTENT).ToString("X"), 4);
-        input_y.text = InputValidation.fillBlanks((STARTING_CONTENT).ToString("X"), 4);
-        input_z.text = InputValidation.fillBlanks((STARTING_CONTENT).ToString("X"), 4);
+        SetCircuitry(defualtCircuitry);
+        x.Reset();
+        y.Reset();
+        z.Reset();
+        input_x.text = x.GetHex();
+        input_y.text = y.GetHex();
+        input_z.text = z.GetHex();
     }
 
     /**
      * @brief Sets the content of ALU x.
      * @param content - New content for ALU x.
      */
-    public void writeX(string content)
+    public void WriteX(string content)
     {
-        //Convert the input from a hex string to decimal format.
-        x = ushort.Parse(
-            InputValidation.fillBlanks(content, 4),
-            System.Globalization.NumberStyles.HexNumber
-        );
-
-        Debug.Log("ALUx: write - " + x);
+        x.SetNumber(content);
+        input_x.text = x.GetHex();
+        Debug.Log("ALUx: write - " + x.ToString());
     }
 
     /**
-     * @brief Retrieves the content held in ALU x.
-     * @return Returns the contnent held in ALU x.
+     * @returns The contnent held in ALU x.
      */
-    public string readX()
+    public string ReadX()
     {
-        Debug.Log("ALUx: read - " + x);
-
-        //Convert the decimal value into a hex string and return it.
-        return InputValidation.fillBlanks(x.ToString("X"), 4);
+        Debug.Log("ALUx: read - " + x.ToString());
+        return x.GetHex();
     }
 
     /**
      * @brief Sets the content of ALU y.
      * @param content - New content for ALU y.
      */
-    public void writeY(string content)
+    public void WriteY(string content)
     {
-        //Convert the input from a hex string to decimal format.
-        y = ushort.Parse(
-            InputValidation.fillBlanks(content, 4),
-            System.Globalization.NumberStyles.HexNumber
+        y.SetNumber(content);
+        input_y.text = y.GetHex();
+        Debug.Log("ALUy: write - " + y.ToString());
+    }
+
+    /**
+     * @returns The content held in ALU y.
+     */
+    public string ReadY()
+    {
+        Debug.Log("ALUy: read - " + y.ToString());
+        return y.GetHex();
+    }
+
+    /**
+     * @returns The content held in ALU z.
+     */
+    public string ReadZ()
+    {
+        Debug.Log("ALUz: read - \n" +
+            "Decimal:\t" + z.GetSigned() + "\n" +
+            "Hex:\t" + z.ToString()
         );
-
-        Debug.Log("ALUy: write - " + y);
-    }
-
-    /**
-     * @brief Retrives the content held in ALU y.
-     * @return Returns the content held in ALU y.
-     */
-    public string readY()
-    {
-        Debug.Log("ALUy: read - " + y);
-
-        //Convert the decimal value into a hex string and return it.
-        return InputValidation.fillBlanks(y.ToString("X"), 4);
-    }
-
-    /**
-     * @brief Retrieves the content held in ALU z.
-     * @return Returns the content held in ALU z.
-     */
-    public string readZ()
-    {
-        Debug.Log("ALUz: read - " + z);
-
-        //Convert the decimal value into a hex string and return it.
-        return InputValidation.fillBlanks(z.ToString("X"), 4);
+        Debug.Log("ALUz: read - " + z.ToString());
+        return z.GetHex();
     }
 
     /**
      * @brief Used X and Y to compute the value of Z.
      */
-    public void computeZ()
+    public void ComputeZ()
     {
-        System.Int32 result = 0x0000;
-
         //Perform a different operation depending on the ALU's circuitry.
         switch (currentCircuitry)
         {
             case CIRCUITRY.ADDITION:
                 {
-                    result = x + y;
-                    break;
-                }
-            case CIRCUITRY.DIVISION:
-                {
-                    result = x / y;
-                    break;
-                }
-            case CIRCUITRY.MULTIPLICATION:
-                {
-                    result = x * y;
+                    z = Number.Add(x, y);
                     break;
                 }
             case CIRCUITRY.SUBTRACTION:
                 {
-                    result = x - y;
+                    z = Number.Subtract(x, y);
+                    break;
+                }
+            case CIRCUITRY.MULTIPLICATION:
+                {
+                    z = Number.Multiply(x, y);
+                    break;
+                }
+            case CIRCUITRY.DIVISION:
+                {
+                    z = Number.Divide(x, y);
                     break;
                 }
         }
 
-        Debug.Log("COMPUTING result: " + result.ToString("X"));
+        Debug.Log("COMPUTING Z: - \n" + z.ToString());
 
-        //Update the PSR.
-        setPSR(result);
-        z = (ushort)result;
-    }
-
-    /**
-     * @brief Checks the state of 'Z' and sets the ALU accordingly.
-     */
-    private void setPSR(System.Int32 value)
-    {
-        //If 'z' is equal to zero (Zero flag).
-        if (value == 0)
-        {
-            PSR.setFlag(ProcessStatusRegister.FLAGS.ZERO, System.Convert.ToBoolean(1));
-        }
-        else
-        {
-            PSR.setFlag(ProcessStatusRegister.FLAGS.ZERO, System.Convert.ToBoolean(0));
-        }
-
-
-        //If 'z' exceeds the signed value range (Overflow flag).
-        if (value > MAX_VALUE || value < (MAX_VALUE * -1))
-        {
-            PSR.setFlag(ProcessStatusRegister.FLAGS.OVERFLOW, System.Convert.ToBoolean(1));
-        }
-        else
-        {
-            PSR.setFlag(ProcessStatusRegister.FLAGS.OVERFLOW, System.Convert.ToBoolean(0));
-        }
-
-        //If 'z' is negative (Negative flag).
-        if (value < 0)
-        {
-            PSR.setFlag(ProcessStatusRegister.FLAGS.NEGATIVE, System.Convert.ToBoolean(1));
-        }
-        else
-        {
-            PSR.setFlag(ProcessStatusRegister.FLAGS.NEGATIVE, System.Convert.ToBoolean(0));
-        }
+        //Update the PSR with the value of Z.
+        z.SetPSR(PSR);
     }
 
     /**
      * @brief Allows the ALU's circuitry to be set.
      * @param newCircuitry - This is the new circuitry for the ALU.
      */
-    public void setCircuitry(CIRCUITRY newCircuitry)
+    public void SetCircuitry(CIRCUITRY newCircuitry)
     {
         //Update the circuitry.
         switch (newCircuitry)
         {
             case CIRCUITRY.ADDITION:
                 {
-                    setAdditionCircuitry();
+                    SetAdditionCircuitry();
                     break;
                 }
             case CIRCUITRY.DIVISION:
                 {
-                    setDivisionCircuitry();
+                    SetDivisionCircuitry();
                     break;
                 }
             case CIRCUITRY.MULTIPLICATION:
                 {
-                    setMultiplicationCircuitry();
+                    SetMultiplicationCircuitry();
                     break;
                 }
             case CIRCUITRY.SUBTRACTION:
                 {
-                    setSubtractionCircuitry();
+                    SetSubtractionCircuitry();
                     break;
                 }
         }
@@ -299,7 +235,7 @@ public class ArithmeticLogicUnit : MonoBehaviour
     /**
      * @Sets the ALU's circuitry to addition.
      */
-    public void setAdditionCircuitry()
+    public void SetAdditionCircuitry()
     {
         Debug.Log("Setting ALU to Addition mode.");
         currentCircuitry = CIRCUITRY.ADDITION;
@@ -309,7 +245,7 @@ public class ArithmeticLogicUnit : MonoBehaviour
     /**
      * @Sets the ALU's circuitry to division.
      */
-    public void setDivisionCircuitry()
+    public void SetDivisionCircuitry()
     {
         Debug.Log("Setting ALU to Division mode.");
         currentCircuitry = CIRCUITRY.DIVISION;
@@ -319,7 +255,7 @@ public class ArithmeticLogicUnit : MonoBehaviour
     /**
      * @Sets the ALU's circuitry to multiplication.
      */
-    public void setMultiplicationCircuitry()
+    public void SetMultiplicationCircuitry()
     {
         Debug.Log("Setting ALU to Multiplication mode.");
         currentCircuitry = CIRCUITRY.MULTIPLICATION;
@@ -329,7 +265,7 @@ public class ArithmeticLogicUnit : MonoBehaviour
     /**
      * @Sets the ALU's circuitry to subtraction.
      */
-    public void setSubtractionCircuitry()
+    public void SetSubtractionCircuitry()
     {
         Debug.Log("Setting ALU to Subtraction mode.");
         currentCircuitry = CIRCUITRY.SUBTRACTION;

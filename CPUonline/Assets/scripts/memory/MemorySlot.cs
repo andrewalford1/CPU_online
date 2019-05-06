@@ -7,7 +7,7 @@ using UnityEngine;
  * @extends ScriptableObject
  * @author Andrew Alford
  * @date 26/02/2019
- * @version 1.1 - 27/02/2019
+ * @version 1.2 - 14/03/2019
  */
 public class MemorySlot : ScriptableObject
 {
@@ -17,48 +17,41 @@ public class MemorySlot : ScriptableObject
     //[myID] This ID of this specific memory slot.
     private int myID;
 
-    //[decimalContent] Stores the content of the 
-    //memory slot in deciaml format.
-    private ushort decimalContent = 0x0000;
+    //[contents] Holds the contents of the memory slot.
+    private Number contents = new Number();
 
     /**
      * @brief Initialises the memory slot.
      */
-    public void init()
+    public void Init()
     {
         //Set the ID and increment it for the next slot.
         myID = ID++;
     }
 
     /**
-     * @brief Retrieves the ID of this memory slot.
-     * @return Returns this memory slots ID.
+     * @returns This memory slots ID.
      */
-    public int getID()
+    public int GetID()
     {
         return myID;
     }
 
     /**
-     * @brief Retrieves the slots default value.
-     * @return Returns the slots defualt value.
+     * @brief Resets the memory slot.
      */
-    public string getStartingContent()
+    public void Reset()
     {
-        return "0000";
+        contents.Reset();
     }
 
     /**
-     * @brief Retrieves the content held in the memory slot.
-     * @return Returns the content held in the memory slot.
+     * @returns The content held in the memory slot.
      */
-    public string read()
+    public string Read()
     {
-        Debug.Log("Reading " + decimalContent + 
-            " from memory slot: " + this.getID());
-
-        //Convert the content to a hexadecimal string.
-        return InputValidation.fillBlanks(decimalContent.ToString("X"), 4);
+        Debug.Log("Memory Slot " + GetID() + ": read - " + contents.ToString());
+        return contents.GetHex();
     }
 
     /**
@@ -66,15 +59,9 @@ public class MemorySlot : ScriptableObject
      * @param content - The content to be written 
      *                  to the memory slot.
      */
-    public void write(string content)
+    public void Write(string content)
     {
-        //Convert the input from a hex string to decimal format.
-        decimalContent = ushort.Parse(
-            InputValidation.fillBlanks(content, 4),
-            System.Globalization.NumberStyles.HexNumber
-        );
-
-        Debug.Log("Writing " + decimalContent + 
-            " to memory slot: " + this.getID());
+        contents.SetNumber(content);
+        Debug.Log("Memory Slot " + GetID() + ": write - " + contents.ToString());
     }
 }

@@ -52,8 +52,8 @@ public class ControlBus : Bus
      */
     public override void transferData()
     {
-        output.write(input.read());
-        outputUI.text = input.read();
+        output.Write(input.ReadString());
+        outputUI.text = input.ReadString();
     }
 
     /**

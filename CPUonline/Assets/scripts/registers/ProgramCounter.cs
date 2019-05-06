@@ -8,7 +8,7 @@ using UnityEngine.UI;
  * @extends Register
  * @author Andrew Alford
  * @date 28/02/2019
- * @version 1.0 - 28/02/2019
+ * @version 1.2 - 14/03/2019
  */
 [CreateAssetMenu(menuName = "Program Counter")]
 public class ProgramCounter : Register
@@ -18,7 +18,7 @@ public class ProgramCounter : Register
      *        (Overriden from the superclass).
      * @param inputField - The input field to be allocated.
      */
-    public override void allocateInputField(InputField inputField)
+    public override void AllocateInputField(InputField inputField)
     {
         input = inputField;
 
@@ -27,18 +27,18 @@ public class ProgramCounter : Register
         { return InputValidation.validateAsHex(addedChar); };
         input.onEndEdit.AddListener(delegate {
             InputValidation.fillBlanks_Register(input);
-            validateUserInput(input);
-            write(input.text);
+            ValidateUserInput(input);
+            Write(input.text);
         });
     }
 
     /**
      * @brief Increments the PC by 1.
      */
-    public void increment()
+    public void Increment()
     {
         //[newValue] Stores the new value of the PC.
-        int newValue = this.decimalContent + 1;
+        int newValue = contents.GetSigned() + 1;
 
         //Reset to 0 if the new value is too big.
         if(newValue >= MemoryListControl.NUM_MEMORY_LOCATIONS)
@@ -47,25 +47,30 @@ public class ProgramCounter : Register
         }
 
         //Write the new value to the PC.
-        this.write(InputValidation.fillBlanks(newValue.ToString("X"), 4));
+        Write(InputValidation.FillBlanks(newValue.ToString("X"), 4));
     }
 
     /**
      * @brief Checks if the user input is within range of the max memory address.
      * @param pcInput - The input field being validated.
      */
-    public void validateUserInput(InputField pcInput)
+    public void ValidateUserInput(InputField pcInput)
     {
         //[currentValue] Convert the input from a hex string to decimal format.
         int currentValue = ushort.Parse(
-            InputValidation.fillBlanks(pcInput.text, 4),
+            InputValidation.FillBlanks(pcInput.text, 4),
             System.Globalization.NumberStyles.HexNumber
         );
 
         //Cap the PC's value to the maximum address index.
         if (currentValue >= MemoryListControl.NUM_MEMORY_LOCATIONS)
         {
-            pcInput.text = InputValidation.fillBlanks((MemoryListControl.NUM_MEMORY_LOCATIONS - 1).ToString("X"), 4);
+            pcInput.text = InputValidation.FillBlanks(
+                (MemoryListControl.NUM_MEMORY_LOCATIONS - 1).ToString("X"), 
+                4
+            );
         }
     }
+
+
 }
